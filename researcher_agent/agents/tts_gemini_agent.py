@@ -70,6 +70,14 @@ class TtsGeminiAgent(BaseAgent):
         """
         logger.info(f"[{self.name}] Starting TTS generation.")
         PROJECT_NAME = os.environ.get("PROJECT_NAME")
+        if not PROJECT_NAME:
+            error_msg = "PROJECT_NAME environment variable not set. Aborting TTS generation."
+            logger.error(f"[{self.name}] {error_msg}")
+            yield Event(
+                author=self.name,
+                content=types.Content(parts=[types.Part(text=error_msg)]),
+            )
+            return
 
         # 1. Get the text prompt from the session state
         prompt_to_speak = ctx.session.state.get(self.input_key)
