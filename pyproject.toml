@@ -1,7 +1,7 @@
 [project]
 name = "neural-reels"
 version = "0.1.0"
-description = "Add your description here"
+description = "AI-Powered Short-Form Video Asset Generator"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
