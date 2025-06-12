@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+.env
+
+# OS
+.DS_Store
+
+# UV
+.python-version
+
+# VS code
+.vscode/
+
+# Output assets
+projects/

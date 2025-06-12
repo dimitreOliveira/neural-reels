@@ -1,1 +1,1 @@
-# neural-reels
+# Neural Reels - AI-Powered Short-Form Video Asset Generator
