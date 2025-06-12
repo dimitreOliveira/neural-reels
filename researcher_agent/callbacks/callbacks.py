@@ -10,6 +10,13 @@ from google.genai import types
 def save_agent_output(callback_context: CallbackContext) -> Optional[types.Content]:
     current_state = callback_context.state.to_dict()
     PROJECT_NAME = os.environ.get("PROJECT_NAME")
+    if not PROJECT_NAME:
+        # Log an error or raise an exception, as this callback might not be able to yield Events.
+        # For example, log and return, or raise a ValueError.
+        print(f"Error: PROJECT_NAME environment variable not set. Cannot save agent output.") # Or use logger
+        # Depending on ADK capabilities, you might not be able to yield an error event here.
+        # Consider how to signal this failure. For now, returning None as per original signature.
+        return None
 
     output_key = list(current_state.keys())[-1]
     agent_response = current_state[output_key]
