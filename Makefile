@@ -6,4 +6,5 @@ app:
 
 lint:
 	ruff check --select I --fix
+	ruff check
 	ruff format
