@@ -182,7 +182,7 @@ class VideoAssemblerAgent(BaseAgent):
             )
 
             yield text2event(self.name, "Setting audio for the final video...")
-            final_video_clip = final_video_clip.set_audio(audio_clip)
+            final_video_clip = final_video_clip.with_audio(audio_clip)
             if (
                 final_video_clip.duration > audio_clip.duration + 0.1
             ):  # Add small tolerance
@@ -193,8 +193,6 @@ class VideoAssemblerAgent(BaseAgent):
                 logger.warning(
                     f"[{self.name}] Final video duration ({final_video_clip.duration:.2f}s) is shorter than audio duration ({audio_clip.duration:.2f}s). Video may end before audio does."
                 )
-                # Optionally trim audio: audio_clip = audio_clip.subclip(0, final_video_clip.duration)
-                # final_video_clip = final_video_clip.set_audio(audio_clip)
 
             output_dir = project_base_path / self.output_subdir
             output_dir.mkdir(parents=True, exist_ok=True)
