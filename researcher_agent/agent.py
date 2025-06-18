@@ -125,7 +125,9 @@ class VideoCreatorWorkflowAgent(BaseAgent):
         async for event in self._run_sub_agent(self.theme_definer, ctx):
             yield event
 
-        theme = ctx.session.state[self.theme_definer.output_key].get("theme", "test")
+        theme_output = ctx.session.state[self.theme_definer.output_key]
+        theme = theme_output.theme if theme_output else "test"
+
 
         assets_path = f"projects/{theme}".lower().replace(" ", "_")
         # set the theme as the output folder
