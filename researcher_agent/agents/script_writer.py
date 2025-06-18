@@ -1,7 +1,9 @@
 from google.adk.agents import Agent
 from pydantic import BaseModel, Field
 
-MODEL_ID = "gemini-2.5-flash-preview-05-20"
+from researcher_agent.callbacks.callbacks import save_agent_output
+
+MODEL_ID = "gemini-2.5-flash"
 
 SCRIPT_WRITER_PROMPT = """
 Based on the user's input and the provided theme '{theme}', and , write a short content video script.
@@ -13,7 +15,7 @@ The script must contain only the text and no text artifacts.
 If the user approves it or if you don't know how to handle the request handle it back the to the orchestrator [OrchestratorAgent],
 other wise iterate with the user to update the result.
 
-The script must have a max of 200 chars.
+The script must have a max of 100 chars.
 """
 
 
@@ -30,5 +32,5 @@ script_writer_agent = Agent(
     output_schema=ScriptOutput,
     disallow_transfer_to_parent=True,
     disallow_transfer_to_peers=True,
-    # after_agent_callback=save_agent_output,
+    after_agent_callback=save_agent_output,
 )

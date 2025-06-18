@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import os
 from pathlib import Path
 from typing import AsyncGenerator
 
@@ -19,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 MODEL_ID = "veo-2.0-generate-001"
 ASPECT_RATIO = "9:16"
-DURATION_SECONDS = 8
+DURATION_SECONDS = 5  # 8
 POLLING_INTERVAL_SECONDS = 10
 API_VERSION = "v1beta"
 
@@ -83,6 +82,10 @@ class VeoAgent(BaseAgent):
     polling_interval_seconds: int = Field(
         default=POLLING_INTERVAL_SECONDS,
         description="Interval in seconds to poll for video generation status.",
+    )
+    enhance_prompt: bool = Field(
+        default=True,
+        description="If should use Veo's prompt enchacing feature.",
     )
 
     # This allows Pydantic to manage the model without extra config
@@ -152,14 +155,15 @@ class VeoAgent(BaseAgent):
         self, ctx: InvocationContext
     ) -> AsyncGenerator[Event, None]:
         logger.info(f"[{self.name}] Starting video generation.")
-        PROJECT_NAME = os.environ.get("PROJECT_NAME")
-        if not PROJECT_NAME:
-            error_msg = (
-                "PROJECT_NAME environment variable not set. Aborting video generation."
-            )
-            logger.error(f"[{self.name}] {error_msg}")
-            yield text2event(self.name, error_msg)
-            return
+
+        # Setup
+        assets_path = Path(ctx.session.state.get("assets_path"))
+        output_dir = assets_path / self.output_subdir
+        output_dir.mkdir(parents=True, exist_ok=True)
+        ctx.session.state[self.output_key] = str(output_dir)
+        logger.info(
+            f"[{self.name}] Stored output path '{output_dir}' in session state key '{self.output_key}'."
+        )
 
         video_prompts = ctx.session.state.get(self.input_key)
         if not video_prompts:
@@ -184,15 +188,13 @@ class VeoAgent(BaseAgent):
             yield text2event(self.name, error_msg)
             return
 
-        output_dir = Path(f"projects/{PROJECT_NAME}") / self.output_subdir
-        output_dir.mkdir(parents=True, exist_ok=True)
-
         try:
             video_gen_config = types.GenerateVideosConfig(
                 number_of_videos=self.number_of_videos,
                 person_generation=self.person_generation,
                 aspect_ratio=self.aspect_ratio,
                 duration_seconds=self.duration_seconds,
+                enhance_prompt=self.enhance_prompt,
             )
 
             # Generate intro video
@@ -207,10 +209,6 @@ class VeoAgent(BaseAgent):
             ):
                 yield event
 
-            ctx.session.state[self.output_key] = str(output_dir)
-            logger.info(
-                f"[{self.name}] Stored output path '{output_dir}' in session state key '{self.output_key}'."
-            )
             final_message = (
                 f"Video generation process completed. Videos saved in '{output_dir}'."
             )

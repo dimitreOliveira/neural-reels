@@ -1,5 +1,5 @@
 import logging
-import os
+from pathlib import Path
 from typing import AsyncGenerator
 
 from google import genai
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 MODEL_ID = "models/imagen-3.0-generate-002"
-ASPECT_RATIO = "3:4"
+ASPECT_RATIO = "9:16"
 
 
 class ImagenAgent(BaseAgent):
@@ -82,14 +82,15 @@ class ImagenAgent(BaseAgent):
         The core implementation of the agent's logic.
         """
         logger.info(f"[{self.name}] Starting image generation.")
-        PROJECT_NAME = os.environ.get("PROJECT_NAME")
-        if not PROJECT_NAME:
-            error_msg = (
-                "PROJECT_NAME environment variable not set. Aborting image generation."
-            )
-            logger.error(f"[{self.name}] {error_msg}")
-            yield text2event(self.name, error_msg)
-            return
+
+        # Setup
+        assets_path = Path(ctx.session.state.get("assets_path"))
+        output_dir = assets_path / self.output_subdir
+        output_dir.mkdir(parents=True, exist_ok=True)
+        ctx.session.state[self.output_key] = str(output_dir)
+        logger.info(
+            f"[{self.name}] Stored output path '{output_dir}' in session state key '{self.output_key}'."
+        )
 
         # 1. Get the text prompt from the session state
         image_prompts = ctx.session.state.get(self.input_key).get(self.input_key)
@@ -132,22 +133,13 @@ class ImagenAgent(BaseAgent):
                     return
 
                 # 4. Extract image data and save it to a file
-                output_dir = os.path.join(
-                    f"projects/{PROJECT_NAME}", self.output_subdir
-                )
                 for image_idx, generated_image in enumerate(result.generated_images):
                     image_bytes = generated_image.image.image_bytes
                     img_filename = f"scene_{scene_idx}_image_{image_idx}.jpg"
-                    output_filepath = os.path.join(output_dir, img_filename)
+                    output_filepath = output_dir / img_filename
                     save_image_from_bytes(image_bytes, output_filepath)
 
-            # 5. Store the full output path in the session state
-            ctx.session.state[self.output_key] = output_dir
-            logger.info(
-                f"[{self.name}] Stored output path '{output_dir}' in session state key '{self.output_key}'."
-            )
-
-            # 6. Yield a response event to signal completion
+            # 5. Yield a response event to signal completion
             final_message = f"Images generated and saved to '{output_dir}'."
             yield text2event(self.name, final_message)
 
