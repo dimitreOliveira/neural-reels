@@ -93,7 +93,11 @@ class ImagenAgent(BaseAgent):
         )
 
         # 1. Get the text prompt from the session state
-        image_prompts = ctx.session.state.get(self.input_key).get(self.input_key)
+        image_prompts_container = ctx.session.state.get(self.input_key)
+        image_prompts = (
+            image_prompts_container.image_prompts if image_prompts_container else []
+        )
+
         if not image_prompts:
             error_msg = (
                 f"Input key '{self.input_key}' not found in session state. Aborting."

@@ -8,7 +8,7 @@ from google.genai import types
 
 def save_agent_output(callback_context: CallbackContext) -> Optional[types.Content]:
     current_state = callback_context.state.to_dict()
-    output_dir = Path(current_state.get("assets_path", "test"))
+    output_dir = Path(current_state.get("assets_path", "projects/default"))
     output_dir.mkdir(exist_ok=True, parents=True)
 
     output_key = list(current_state.keys())[-1]

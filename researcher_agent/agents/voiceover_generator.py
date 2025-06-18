@@ -86,7 +86,9 @@ class VoiceoverGeneratorAgent(BaseAgent):
         output_filepath = os.path.join(assets_path, self.output_filename)
 
         # 1. Get the text prompt from the session state
-        prompt_to_speak = ctx.session.state.get(self.input_key).get(self.input_key)
+        script_container = ctx.session.state.get(self.input_key)
+        prompt_to_speak = script_container.script if script_container else ""
+
         if not prompt_to_speak:
             error_msg = (
                 f"Input key '{self.input_key}' not found in session state. Aborting."

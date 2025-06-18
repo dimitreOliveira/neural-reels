@@ -126,8 +126,7 @@ class VideoCreatorWorkflowAgent(BaseAgent):
             yield event
 
         theme_output = ctx.session.state[self.theme_definer.output_key]
-        theme = theme_output.theme if theme_output else "test"
-
+        theme = theme_output.theme if theme_output else "default"
 
         assets_path = f"projects/{theme}".lower().replace(" ", "_")
         # set the theme as the output folder
