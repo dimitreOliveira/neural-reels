@@ -1,7 +1,7 @@
 from google.adk.agents import Agent
 from pydantic import BaseModel, Field
 
-MODEL_ID = "gemini-2.5-flash-preview-05-20"
+MODEL_ID = "gemini-2.5-flash"
 
 THEME_DEFINER_PROMPT = """
 # Your role
@@ -41,5 +41,4 @@ theme_definer_agent = Agent(
     output_schema=ThemeOutput,
     disallow_transfer_to_parent=True,
     disallow_transfer_to_peers=True,
-    # after_agent_callback=save_agent_output,
 )

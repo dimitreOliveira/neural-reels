@@ -80,17 +80,15 @@ class VoiceoverGeneratorAgent(BaseAgent):
         The core implementation of the agent's logic.
         """
         logger.info(f"[{self.name}] Starting TTS generation.")
-        PROJECT_NAME = os.environ.get("PROJECT_NAME")
-        if not PROJECT_NAME:
-            error_msg = (
-                "PROJECT_NAME environment variable not set. Aborting TTS generation."
-            )
-            logger.error(f"[{self.name}] {error_msg}")
-            yield text2event(self.name, error_msg)
-            return
+
+        # Setup
+        assets_path = ctx.session.state.get("assets_path")
+        output_filepath = os.path.join(assets_path, self.output_filename)
 
         # 1. Get the text prompt from the session state
-        prompt_to_speak = ctx.session.state.get(self.input_key).get(self.input_key)
+        script_container = ctx.session.state.get(self.input_key)
+        prompt_to_speak = script_container.script if script_container else ""
+
         if not prompt_to_speak:
             error_msg = (
                 f"Input key '{self.input_key}' not found in session state. Aborting."
@@ -116,9 +114,6 @@ class VoiceoverGeneratorAgent(BaseAgent):
 
             # 3. Extract audio data and save it to a WAV file
             audio_data = response.candidates[0].content.parts[0].inline_data.data
-            output_dir = f"projects/{PROJECT_NAME}"
-            output_filepath = os.path.join(output_dir, self.output_filename)
-
             save_wave_file(output_filepath, audio_data)
 
             # 4. Store the output filename in the session state using `self.output_key`

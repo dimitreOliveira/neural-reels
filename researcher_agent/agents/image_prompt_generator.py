@@ -1,7 +1,9 @@
 from google.adk.agents import Agent
 from pydantic import BaseModel, Field
 
-MODEL_ID = "gemini-2.5-flash-preview-05-20"
+from researcher_agent.callbacks.callbacks import save_agent_output
+
+MODEL_ID = "gemini-2.5-flash"
 
 
 IMAGE_PROMPT_GENERATOR_PROMPT = """
@@ -48,5 +50,5 @@ image_prompt_generator_agent = Agent(
     output_schema=ImagePromptsOutput,
     disallow_transfer_to_parent=True,
     disallow_transfer_to_peers=True,
-    # after_agent_callback=save_agent_output,
+    after_agent_callback=save_agent_output,
 )

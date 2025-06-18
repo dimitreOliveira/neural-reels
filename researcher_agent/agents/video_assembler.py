@@ -1,5 +1,4 @@
 import logging
-import os
 from pathlib import Path
 from typing import AsyncGenerator
 
@@ -79,14 +78,16 @@ class VideoAssemblerAgent(BaseAgent):
         self, ctx: InvocationContext
     ) -> AsyncGenerator[Event, None]:
         logger.info(f"[{self.name}] Starting video assembly.")
-        PROJECT_NAME = os.environ.get("PROJECT_NAME")
-        if not PROJECT_NAME:
-            error_msg = (
-                "PROJECT_NAME environment variable not set. Aborting video assembly."
-            )
-            logger.error(f"[{self.name}] {error_msg}")
-            yield text2event(self.name, error_msg)
-            return
+
+        # Setup
+        assets_path = Path(ctx.session.state.get("assets_path"))
+        output_dir = assets_path / self.output_subdir
+        output_dir.mkdir(parents=True, exist_ok=True)
+        final_video_filepath = output_dir / self.output_filename
+        ctx.session.state[self.output_key] = str(final_video_filepath)
+        logger.info(
+            f"[{self.name}] Stored final video path '{final_video_filepath}' in session state key '{self.output_key}'."
+        )
 
         try:
             # 1. Get asset paths from session state
@@ -113,10 +114,9 @@ class VideoAssemblerAgent(BaseAgent):
                 yield text2event(self.name, error_msg)
                 return
 
-            project_base_path = Path(f"projects/{PROJECT_NAME}")
             videos_dir = Path(videos_base_dir_str)
             images_dir = Path(images_dir_str)
-            voiceover_audio_path = project_base_path / voiceover_filename_in_state
+            voiceover_audio_path = assets_path / voiceover_filename_in_state
 
             intro_video_path = videos_dir / self.intro_video_filename
             outro_video_path = videos_dir / self.outro_video_filename
@@ -194,10 +194,6 @@ class VideoAssemblerAgent(BaseAgent):
                     f"[{self.name}] Final video duration ({final_video_clip.duration:.2f}s) is shorter than audio duration ({audio_clip.duration:.2f}s). Video may end before audio does."
                 )
 
-            output_dir = project_base_path / self.output_subdir
-            output_dir.mkdir(parents=True, exist_ok=True)
-            final_video_filepath = output_dir / self.output_filename
-
             yield text2event(
                 self.name, f"Exporting final video to {final_video_filepath}..."
             )
@@ -208,10 +204,6 @@ class VideoAssemblerAgent(BaseAgent):
                 audio_codec="aac",
             )
 
-            ctx.session.state[self.output_key] = str(final_video_filepath)
-            logger.info(
-                f"[{self.name}] Stored final video path '{final_video_filepath}' in session state key '{self.output_key}'."
-            )
             final_message = (
                 f"Video successfully assembled and saved to '{final_video_filepath}'."
             )

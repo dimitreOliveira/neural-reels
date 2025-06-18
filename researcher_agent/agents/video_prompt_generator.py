@@ -1,7 +1,9 @@
 from google.adk.agents import Agent
 from pydantic import BaseModel, Field
 
-MODEL_ID = "gemini-2.5-flash-preview-05-20"
+from researcher_agent.callbacks.callbacks import save_agent_output
+
+MODEL_ID = "gemini-2.5-flash"
 
 VIDEO_PROMPT_GENERATOR_PROMPT = """
 Based on the following script, generate video generation prompts.
@@ -45,5 +47,5 @@ video_prompt_generator_agent = Agent(
     output_schema=VideoPromptsOutput,
     disallow_transfer_to_parent=True,
     disallow_transfer_to_peers=True,
-    # after_agent_callback=save_agent_output,
+    after_agent_callback=save_agent_output,
 )
