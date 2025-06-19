@@ -1,5 +1,5 @@
 import logging
-import os
+from pathlib import Path
 from typing import AsyncGenerator
 
 from google import genai
@@ -72,6 +72,28 @@ class VoiceoverGeneratorAgent(BaseAgent):
         self.client = get_client()
         self.generate_content_config = get_generate_content_config(self.voice_name)
 
+    async def _generate_audio(
+        self, prompt_to_speak: str, output_filepath: str
+    ) -> AsyncGenerator[Event, None]:
+        """
+        Generates audio from the given prompt and saves it to the specified path.
+        """
+        # 2. Call the Gemini API to generate audio content
+        logger.info(f"[{self.name}] Calling Gemini API with model '{self.model}'...")
+        response = self.client.models.generate_content(
+            model=self.model,
+            contents=prompt_to_speak,
+            config=self.generate_content_config,
+        )
+
+        # 3. Extract audio data and save it to a WAV file
+        audio_data = response.candidates[0].content.parts[0].inline_data.data
+        save_wave_file(output_filepath, audio_data)
+
+        # 4. Yield a response event to signal completion
+        final_message = f"Audio generated and saved to '{output_filepath}'."
+        yield text2event(self.name, final_message)
+
     @override
     async def _run_async_impl(
         self, ctx: InvocationContext
@@ -82,12 +104,16 @@ class VoiceoverGeneratorAgent(BaseAgent):
         logger.info(f"[{self.name}] Starting TTS generation.")
 
         # Setup
-        assets_path = ctx.session.state.get("assets_path")
-        output_filepath = os.path.join(assets_path, self.output_filename)
+        assets_path = Path(ctx.session.state.get("assets_path"))
+        output_filepath = assets_path / self.output_filename
+        output_filepath.parent.mkdir(parents=True, exist_ok=True)
+        ctx.session.state[self.output_key] = self.output_filename
+        logger.info(
+            f"[{self.name}] Stored output path '{output_filepath}' in session state key '{self.output_key}'."
+        )
 
         # 1. Get the text prompt from the session state
-        script_container = ctx.session.state.get(self.input_key)
-        prompt_to_speak = script_container.script if script_container else ""
+        prompt_to_speak = ctx.session.state.get(self.input_key).get(self.input_key)
 
         if not prompt_to_speak:
             error_msg = (
@@ -102,29 +128,10 @@ class VoiceoverGeneratorAgent(BaseAgent):
         )
 
         try:
-            # 2. Call the Gemini API to generate audio content
-            logger.info(
-                f"[{self.name}] Calling Gemini API with model '{self.model}'..."
-            )
-            response = self.client.models.generate_content(
-                model=self.model,
-                contents=prompt_to_speak,
-                config=self.generate_content_config,
-            )
-
-            # 3. Extract audio data and save it to a WAV file
-            audio_data = response.candidates[0].content.parts[0].inline_data.data
-            save_wave_file(output_filepath, audio_data)
-
-            # 4. Store the output filename in the session state using `self.output_key`
-            ctx.session.state[self.output_key] = self.output_filename
-            logger.info(
-                f"[{self.name}] Stored output path '{output_filepath}' in session state key '{self.output_key}'."
-            )
-
-            # 5. Yield a response event to signal completion
-            final_message = f"Audio generated and saved to '{output_filepath}'."
-            yield text2event(self.name, final_message)
+            async for event in self._generate_audio(
+                prompt_to_speak, str(output_filepath)
+            ):
+                yield event
 
         except Exception as e:
             error_msg = f"An error occurred during TTS generation: {e}"

@@ -88,7 +88,6 @@ class VeoAgent(BaseAgent):
         description="If should use Veo's prompt enchacing feature.",
     )
 
-    # This allows Pydantic to manage the model without extra config
     model_config = {"arbitrary_types_allowed": True}
 
     def __init__(self, **kwargs):

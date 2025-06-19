@@ -39,6 +39,4 @@ theme_definer_agent = Agent(
     model=MODEL_ID,
     output_key="theme",
     output_schema=ThemeOutput,
-    disallow_transfer_to_parent=True,
-    disallow_transfer_to_peers=True,
 )

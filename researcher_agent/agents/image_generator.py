@@ -27,6 +27,7 @@ class ImagenAgent(BaseAgent):
     """
 
     client: genai.Client = None
+    image_gen_config: dict = None
 
     # --- Pydantic Fields for Agent Configuration ---
     name: str = Field(
@@ -67,12 +68,47 @@ class ImagenAgent(BaseAgent):
         description="Aspect ratio of the generated image (e.g., '1:1', '16:9').",
     )
 
-    # This allows Pydantic to manage the model without extra config
     model_config = {"arbitrary_types_allowed": True}
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.client = get_client()
+        self.image_gen_config = dict(
+            number_of_images=self.imags_per_prompt,
+            output_mime_type=self.output_mime_type,
+            person_generation=self.person_generation,
+            aspect_ratio=self.aspect_ratio,
+        )
+
+    async def _generate_image(
+        self, scene_idx: int, image_prompt: str, output_dir: Path
+    ) -> AsyncGenerator[Event, None]:
+        """
+        Generates an image for a single scene/prompt, yields status events,
+        and saves the image.
+        """
+        yield text2event(
+            self.name,
+            f"Generating image for scene {scene_idx + 1} with prompt: '{image_prompt[:50]}' ...",
+        )
+        result = self.client.models.generate_images(
+            model=self.model, prompt=image_prompt, config=self.image_gen_config
+        )
+
+        if not result.generated_images:
+            error_msg = f"Image generation failed for scene {scene_idx + 1}. The API returned no images."
+            logger.error(f"[{self.name}] {error_msg}")
+            yield text2event(self.name, error_msg)
+            return
+
+        for image_idx, generated_image in enumerate(result.generated_images):
+            image_bytes = generated_image.image.image_bytes
+            img_filename = f"scene_{scene_idx}_image_{image_idx}.jpg"
+            output_filepath = output_dir / img_filename
+            save_image_from_bytes(image_bytes, output_filepath)
+            logger.info(
+                f"[{self.name}] Image for scene {scene_idx + 1}, variant {image_idx + 1} saved to '{output_filepath}'"
+            )
 
     @override
     async def _run_async_impl(
@@ -93,10 +129,7 @@ class ImagenAgent(BaseAgent):
         )
 
         # 1. Get the text prompt from the session state
-        image_prompts_container = ctx.session.state.get(self.input_key)
-        image_prompts = (
-            image_prompts_container.image_prompts if image_prompts_container else []
-        )
+        image_prompts = ctx.session.state.get(self.input_key).get(self.input_key)
 
         if not image_prompts:
             error_msg = (
@@ -107,43 +140,17 @@ class ImagenAgent(BaseAgent):
             return
 
         try:
-            # 2. Build the configuration dictionary for the API call
-            image_gen_config = dict(
-                number_of_images=self.imags_per_prompt,
-                output_mime_type=self.output_mime_type,
-                person_generation=self.person_generation,
-                aspect_ratio=self.aspect_ratio,
-            )
-
-            # 3. Call the Imagen API to generate images
+            # 2. Call the Imagen API to generate images
             logger.info(
                 f"[{self.name}] Calling Imagen API with model '{self.model}'..."
             )
             for scene_idx, image_prompt in enumerate(image_prompts):
-                yield text2event(
-                    self.name, f"Generating image for scene {scene_idx + 1}..."
-                )
-                logger.info(
-                    f"[{self.name}] Generating image for prompt: '{image_prompt[:70]}...'"
-                )
-                result = self.client.models.generate_images(
-                    model=self.model, prompt=image_prompt, config=image_gen_config
-                )
+                async for event in self._generate_image(
+                    scene_idx, image_prompt, output_dir
+                ):
+                    yield event
 
-                if not result.generated_images:
-                    error_msg = "Image generation failed. The API returned no images."
-                    logger.error(f"[{self.name}] {error_msg}")
-                    yield text2event(self.name, error_msg)
-                    return
-
-                # 4. Extract image data and save it to a file
-                for image_idx, generated_image in enumerate(result.generated_images):
-                    image_bytes = generated_image.image.image_bytes
-                    img_filename = f"scene_{scene_idx}_image_{image_idx}.jpg"
-                    output_filepath = output_dir / img_filename
-                    save_image_from_bytes(image_bytes, output_filepath)
-
-            # 5. Yield a response event to signal completion
+            # 4. Yield a response event to signal completion
             final_message = f"Images generated and saved to '{output_dir}'."
             yield text2event(self.name, final_message)
 

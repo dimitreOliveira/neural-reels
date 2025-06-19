@@ -14,6 +14,9 @@ from researcher_agent.agents.image_generator import (
 from researcher_agent.agents.image_prompt_generator import (
     image_prompt_generator_agent,
 )
+from researcher_agent.agents.scene_breakdown import (
+    scene_breakdown_agent,
+)
 from researcher_agent.agents.script_writer import script_writer_agent
 from researcher_agent.agents.theme_definer import theme_definer_agent
 from researcher_agent.agents.video_assembler import (
@@ -45,6 +48,7 @@ class VideoCreatorWorkflowAgent(BaseAgent):
 
     theme_definer: Agent
     script_writer: Agent
+    scene_breakdown: Agent
     image_prompt_generator: Agent
     video_prompt_generator: Agent
     voiceover_generator: VoiceoverGeneratorAgent
@@ -59,6 +63,7 @@ class VideoCreatorWorkflowAgent(BaseAgent):
         name: str,
         theme_definer: Agent,
         script_writer: Agent,
+        scene_breakdown: Agent,
         image_prompt_generator: Agent,
         video_prompt_generator: Agent,
         voiceover_generator: VoiceoverGeneratorAgent,
@@ -69,6 +74,7 @@ class VideoCreatorWorkflowAgent(BaseAgent):
         sub_agents_list = [
             theme_definer,
             script_writer,
+            scene_breakdown,
             image_prompt_generator,
             video_prompt_generator,
             voiceover_generator,
@@ -80,6 +86,7 @@ class VideoCreatorWorkflowAgent(BaseAgent):
             name=name,
             theme_definer=theme_definer,
             script_writer=script_writer,
+            scene_breakdown=scene_breakdown,
             image_prompt_generator=image_prompt_generator,
             video_prompt_generator=video_prompt_generator,
             voiceover_generator=voiceover_generator,
@@ -105,7 +112,7 @@ class VideoCreatorWorkflowAgent(BaseAgent):
             error_msg = f"[{self.name}] {agent.name} did not produce '{agent.output_key}' in session state. Aborting workflow."
             logger.error(error_msg)
             yield text2event(self.name, error_msg)
-            return  # Stop this helper's execution; error event yielded
+            return
 
         logger.info(
             f"[{self.name}] {agent.name} completed. Output for '{agent.output_key}': {agent_output}"
@@ -119,14 +126,13 @@ class VideoCreatorWorkflowAgent(BaseAgent):
             f"\n\n[{self.name}] Starting short content video creation workflow.\n\n"
         )
 
-        # Setup
-
         # 1. Define Theme
         async for event in self._run_sub_agent(self.theme_definer, ctx):
             yield event
 
-        theme_output = ctx.session.state[self.theme_definer.output_key]
-        theme = theme_output.theme if theme_output else "default"
+        theme = ctx.session.state[self.theme_definer.output_key].get(
+            self.theme_definer.output_key, "default"
+        )
 
         assets_path = f"projects/{theme}".lower().replace(" ", "_")
         # set the theme as the output folder
@@ -139,29 +145,33 @@ class VideoCreatorWorkflowAgent(BaseAgent):
         async for event in self._run_sub_agent(self.script_writer, ctx):
             yield event
 
-        # 3. Image prompts generation
+        # 3. Scene breakdown
+        async for event in self._run_sub_agent(self.scene_breakdown, ctx):
+            yield event
+
+        # 4. Image prompts generation
         async for event in self._run_sub_agent(self.image_prompt_generator, ctx):
             yield event
 
-        # 4. Video prompts generation
-        async for event in self._run_sub_agent(self.video_prompt_generator, ctx):
-            yield event
+        # # 5. Video prompts generation
+        # async for event in self._run_sub_agent(self.video_prompt_generator, ctx):
+        #     yield event
 
-        # 5. Voiceover generation
-        async for event in self._run_sub_agent(self.voiceover_generator, ctx):
-            yield event
+        # # 6. Voiceover generation
+        # async for event in self._run_sub_agent(self.voiceover_generator, ctx):
+        #     yield event
 
-        # 6. Image generation
+        # 7. Image generation
         async for event in self._run_sub_agent(self.image_generator, ctx):
             yield event
 
-        # 7. Video generation
-        async for event in self._run_sub_agent(self.video_generator, ctx):
-            yield event
+        # # 8. Video generation
+        # async for event in self._run_sub_agent(self.video_generator, ctx):
+        #     yield event
 
-        # 8. Video assembling
-        async for event in self._run_sub_agent(self.video_assembler, ctx):
-            yield event
+        # # 9. Video assembling
+        # async for event in self._run_sub_agent(self.video_assembler, ctx):
+        #     yield event
 
         # Workflow Completion Summary
         completion_msg = f"Short video content creation workflow finished, assests saved to '{assets_path}'"
@@ -178,6 +188,7 @@ video_creator_workflow_agent = VideoCreatorWorkflowAgent(
     name="VideoCreatorWorkflowAgent",
     theme_definer=theme_definer_agent,
     script_writer=script_writer_agent,
+    scene_breakdown=scene_breakdown_agent,
     image_prompt_generator=image_prompt_generator_agent,
     video_prompt_generator=video_prompt_generator_agent,
     voiceover_generator=voiceover_generator_agent,
