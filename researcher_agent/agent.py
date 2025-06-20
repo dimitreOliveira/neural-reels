@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from typing import AsyncGenerator
 
 from dotenv import load_dotenv
@@ -135,6 +136,7 @@ class VideoCreatorWorkflowAgent(BaseAgent):
         )
 
         assets_path = f"projects/{theme}".lower().replace(" ", "_")
+        Path(assets_path).mkdir(parents=True, exist_ok=True)
         # set the theme as the output folder
         ctx.session.state["assets_path"] = assets_path
         logger.info(
@@ -153,13 +155,13 @@ class VideoCreatorWorkflowAgent(BaseAgent):
         async for event in self._run_sub_agent(self.image_prompt_generator, ctx):
             yield event
 
-        # # 5. Video prompts generation
-        # async for event in self._run_sub_agent(self.video_prompt_generator, ctx):
-        #     yield event
+        # 5. Video prompts generation
+        async for event in self._run_sub_agent(self.video_prompt_generator, ctx):
+            yield event
 
-        # # 6. Voiceover generation
-        # async for event in self._run_sub_agent(self.voiceover_generator, ctx):
-        #     yield event
+        # 6. Voiceover generation
+        async for event in self._run_sub_agent(self.voiceover_generator, ctx):
+            yield event
 
         # 7. Image generation
         async for event in self._run_sub_agent(self.image_generator, ctx):

@@ -43,7 +43,7 @@ class ImagenAgent(BaseAgent):
     )
     output_key: str = Field(
         default="images_path",
-        description="The key in the session state to store the path of the saved image file.",
+        description="The key in the session state to store the path of the directory where generated images files are saved.",
     )
     output_subdir: str = Field(
         default="images",
@@ -81,18 +81,18 @@ class ImagenAgent(BaseAgent):
         )
 
     async def _generate_image(
-        self, scene_idx: int, image_prompt: str, output_dir: Path
+        self, scene_idx: int, prompt: str, output_dir: Path
     ) -> AsyncGenerator[Event, None]:
         """
         Generates an image for a single scene/prompt, yields status events,
         and saves the image.
         """
-        yield text2event(
-            self.name,
-            f"Generating image for scene {scene_idx + 1} with prompt: '{image_prompt[:50]}' ...",
+        logger.info(
+            f"[{self.name}] Generating image for scene {scene_idx + 1} with prompt: '{prompt[:70]}...'"
         )
+        yield text2event(self.name, f"Generating image for scene {scene_idx + 1}...")
         result = self.client.models.generate_images(
-            model=self.model, prompt=image_prompt, config=self.image_gen_config
+            model=self.model, prompt=prompt, config=self.image_gen_config
         )
 
         if not result.generated_images:
@@ -103,9 +103,10 @@ class ImagenAgent(BaseAgent):
 
         for image_idx, generated_image in enumerate(result.generated_images):
             image_bytes = generated_image.image.image_bytes
-            img_filename = f"scene_{scene_idx}_image_{image_idx}.jpg"
+            img_filename = f"image_{image_idx + 1}.jpg"
             output_filepath = output_dir / img_filename
             save_image_from_bytes(image_bytes, output_filepath)
+
             logger.info(
                 f"[{self.name}] Image for scene {scene_idx + 1}, variant {image_idx + 1} saved to '{output_filepath}'"
             )
@@ -121,17 +122,9 @@ class ImagenAgent(BaseAgent):
 
         # Setup
         assets_path = Path(ctx.session.state.get("assets_path"))
-        output_dir = assets_path / self.output_subdir
-        output_dir.mkdir(parents=True, exist_ok=True)
-        ctx.session.state[self.output_key] = str(output_dir)
-        logger.info(
-            f"[{self.name}] Stored output path '{output_dir}' in session state key '{self.output_key}'."
-        )
+        prompts = ctx.session.state.get(self.input_key).get(self.input_key)
 
-        # 1. Get the text prompt from the session state
-        image_prompts = ctx.session.state.get(self.input_key).get(self.input_key)
-
-        if not image_prompts:
+        if not prompts:
             error_msg = (
                 f"Input key '{self.input_key}' not found in session state. Aborting."
             )
@@ -139,18 +132,21 @@ class ImagenAgent(BaseAgent):
             yield text2event(self.name, error_msg)
             return
 
+        logger.info(
+            f"[{self.name}] Received {len(prompts)} prompt(s) for image generation."
+        )
+        logger.info(f"[{self.name}] Calling Imagen API with model '{self.model}'...")
+
         try:
-            # 2. Call the Imagen API to generate images
-            logger.info(
-                f"[{self.name}] Calling Imagen API with model '{self.model}'..."
-            )
-            for scene_idx, image_prompt in enumerate(image_prompts):
-                async for event in self._generate_image(
-                    scene_idx, image_prompt, output_dir
-                ):
+            ctx.session.state[self.output_key] = []
+            for scene_idx, prompt in enumerate(prompts):
+                output_dir = assets_path / f"scene_{scene_idx + 1}" / self.output_subdir
+                output_dir.mkdir(parents=True, exist_ok=True)
+                ctx.session.state[self.output_key].append(str(output_dir))
+
+                async for event in self._generate_image(scene_idx, prompt, output_dir):
                     yield event
 
-            # 4. Yield a response event to signal completion
             final_message = f"Images generated and saved to '{output_dir}'."
             yield text2event(self.name, final_message)
 
@@ -164,8 +160,8 @@ image_generator_agent = ImagenAgent(
     name="ImageGeneratorAgent",
     description="Generates images from a text prompts.",
     input_key="image_prompts",
-    output_key="images_path",
     output_subdir="images",
+    output_key="images_path",
     model=MODEL_ID,
     aspect_ratio=ASPECT_RATIO,
 )

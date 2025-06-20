@@ -30,6 +30,7 @@ class VeoAgent(BaseAgent):
     """
 
     client: genai.Client = None
+    video_gen_config: types.GenerateVideosConfig = None
 
     # --- Pydantic Fields for Agent Configuration ---
     name: str = Field(
@@ -43,17 +44,9 @@ class VeoAgent(BaseAgent):
         default="video_prompts",
         description="The key in the session state holding the dict with the text prompt(s) for video generation.",
     )
-    intro_input_key: str = Field(
-        default="intro_video_prompt",
-        description="The key in the session state holding the text prompt(s) for intro video generation.",
-    )
-    outro_input_key: str = Field(
-        default="outro_video_prompts",
-        description="The key in the session state holding the text prompt(s) for outro video generation.",
-    )
     output_key: str = Field(
         default="videos_path",
-        description="The key in the session state to store the path of the directory where video files are saved.",
+        description="The key in the session state to store the path of the directory where generated video files are saved.",
     )
     output_subdir: str = Field(
         default="videos",
@@ -93,12 +86,19 @@ class VeoAgent(BaseAgent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.client = get_client(http_options={"api_version": API_VERSION})
+        self.video_gen_config = types.GenerateVideosConfig(
+            number_of_videos=self.number_of_videos,
+            person_generation=self.person_generation,
+            aspect_ratio=self.aspect_ratio,
+            duration_seconds=self.duration_seconds,
+            enhance_prompt=self.enhance_prompt,
+        )
 
     async def _generate_video(
         self,
-        video_name: str,
-        prompt_text: str,
-        video_gen_config: types.GenerateVideosConfig,
+        # video_name: str,
+        scene_idx: int,
+        prompt: str,
         output_dir: Path,
     ) -> AsyncGenerator[Event, bool]:
         """
@@ -106,17 +106,19 @@ class VeoAgent(BaseAgent):
         and returns True if successful, False otherwise.
         """
         logger.info(
-            f"[{self.name}] Generating video for '{video_name}' with prompt: '{prompt_text[:70]}...'"
+            f"[{self.name}] Generating image for scene {scene_idx + 1} with prompt: '{prompt[:70]}...'"
         )
-        yield text2event(self.name, f"Generating video for '{video_name}'...")
+        yield text2event(self.name, f"Generating image for scene {scene_idx + 1}...")
 
         operation = self.client.models.generate_videos(
-            model=self.model, prompt=prompt_text, config=video_gen_config
+            model=self.model, prompt=prompt, config=self.video_gen_config
         )
-        logger.info(f"[{self.name}] Video generation started for '{video_name}'.")
+        logger.info(
+            f"[{self.name}] Video generation started for scene '{scene_idx + 1}'."
+        )
 
         while not operation.done:
-            status_msg = f"Video for '{video_name}' generation in progess. Will check again in {self.polling_interval_seconds}s."
+            status_msg = f"Video for scene '{scene_idx + 1}' generation in progess. Will check again in {self.polling_interval_seconds}s."
             logger.info(f"[{self.name}] {status_msg}")
             yield text2event(self.name, status_msg)
             await asyncio.sleep(self.polling_interval_seconds)
@@ -124,25 +126,25 @@ class VeoAgent(BaseAgent):
 
         result = operation.result
         if not result or not result.generated_videos:
-            error_msg = f"Video generation failed or no videos returned for '{video_name}' (prompt: '{prompt_text[:70]}...')."
+            error_msg = f"Video generation failed for scene {scene_idx + 1}. The API returned no videos."
             logger.error(f"[{self.name}] {error_msg}")
             yield text2event(self.name, error_msg)
             return
 
         logger.info(
-            f"[{self.name}] Generated {len(result.generated_videos)} video(s) for '{video_name}'."
+            f"[{self.name}] Generated {len(result.generated_videos)} video(s) for scene {scene_idx + 1}'."
         )
         for video_idx, generated_video_entry in enumerate(result.generated_videos):
             logger.info(
                 f"[{self.name}] Video has been generated: {generated_video_entry.video.uri}"
             )
-            video_filename = f"{video_name}_video_{video_idx}.mp4"
+            video_filename = f"video_{video_idx + 1}.mp4"
             output_filepath = output_dir / video_filename
             try:
                 self.client.files.download(file=generated_video_entry.video)
                 generated_video_entry.video.save(str(output_filepath))
                 logger.info(
-                    f"[{self.name}] Video for '{video_name}', variant {video_idx + 1} saved to '{output_filepath}'"
+                    f"[{self.name}] Video for scene {scene_idx + 1}', variant {video_idx + 1} saved to '{output_filepath}'"
                 )
             except Exception as e_save:
                 error_msg = f"Error saving video {output_filepath}: {e_save}"
@@ -157,60 +159,32 @@ class VeoAgent(BaseAgent):
 
         # Setup
         assets_path = Path(ctx.session.state.get("assets_path"))
-        output_dir = assets_path / self.output_subdir
-        output_dir.mkdir(parents=True, exist_ok=True)
-        ctx.session.state[self.output_key] = str(output_dir)
+        prompts = ctx.session.state.get(self.input_key).get(self.input_key)
+
+        if not prompts:
+            error_msg = (
+                f"Input key '{self.input_key}' not found in session state. Aborting."
+            )
+            logger.error(f"[{self.name}] {error_msg}")
+            yield text2event(self.name, error_msg)
+            return
+
         logger.info(
-            f"[{self.name}] Stored output path '{output_dir}' in session state key '{self.output_key}'."
+            f"[{self.name}] Received {len(prompts)} prompt(s) for video generation."
         )
-
-        video_prompts = ctx.session.state.get(self.input_key)
-        if not video_prompts:
-            error_msg = f"Input key '{self.input_key}' (object/dict container for prompts) not found in session state. Aborting."
-            logger.error(f"[{self.name}] {error_msg}")
-            yield text2event(self.name, error_msg)
-            return
-
-        # Get intro video prompt
-        intro_video_prompt = video_prompts.get(self.intro_input_key)
-        if not intro_video_prompt:
-            error_msg = f"Intro input key '{self.intro_input_key}' (object/dict container for prompts) not found in session state. Aborting."
-            logger.error(f"[{self.name}] {error_msg}")
-            yield text2event(self.name, error_msg)
-            return
-
-        # Get outro video prompt
-        outro_video_prompt = video_prompts.get(self.outro_input_key)
-        if not outro_video_prompt:
-            error_msg = f"Outro input key '{self.outro_input_key}' (object/dict container for prompts) not found in session state. Aborting."
-            logger.error(f"[{self.name}] {error_msg}")
-            yield text2event(self.name, error_msg)
-            return
+        logger.info(f"[{self.name}] Calling Veo API with model '{self.model}'...")
 
         try:
-            video_gen_config = types.GenerateVideosConfig(
-                number_of_videos=self.number_of_videos,
-                person_generation=self.person_generation,
-                aspect_ratio=self.aspect_ratio,
-                duration_seconds=self.duration_seconds,
-                enhance_prompt=self.enhance_prompt,
-            )
+            ctx.session.state[self.output_key] = []
+            for scene_idx, prompt in enumerate(prompts):
+                output_dir = assets_path / f"scene_{scene_idx + 1}" / self.output_subdir
+                output_dir.mkdir(parents=True, exist_ok=True)
+                ctx.session.state[self.output_key].append(str(output_dir))
 
-            # Generate intro video
-            async for event in self._generate_video(
-                "intro", intro_video_prompt, video_gen_config, output_dir
-            ):
-                yield event
+                async for event in self._generate_video(scene_idx, prompt, output_dir):
+                    yield event
 
-            # Generate outro video
-            async for event in self._generate_video(
-                "outro", outro_video_prompt, video_gen_config, output_dir
-            ):
-                yield event
-
-            final_message = (
-                f"Video generation process completed. Videos saved in '{output_dir}'."
-            )
+            final_message = f"Video generated and saved to '{output_dir}'."
             yield text2event(self.name, final_message)
 
         except Exception as e:
@@ -223,8 +197,6 @@ video_generator_agent = VeoAgent(
     name="VideoGeneratorAgent",
     description="Generates videos from a text prompts.",
     input_key="video_prompts",
-    intro_input_key="intro_video_prompt",
-    outro_input_key="outro_video_prompt",
     output_key="videos_path",
     output_subdir="videos",
     model=MODEL_ID,
