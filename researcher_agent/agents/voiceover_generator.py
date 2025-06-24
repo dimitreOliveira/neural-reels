@@ -42,7 +42,7 @@ class VoiceoverGeneratorAgent(BaseAgent):
         description="The description of the agent.",
     )
     input_key: str = Field(
-        default="scene_texts",
+        default="scenes",
         description="The key in the session state holding the list of text prompts to convert to speech, one for each scene.",
     )
     output_key: str = Field(

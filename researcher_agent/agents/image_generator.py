@@ -54,7 +54,7 @@ class ImagenAgent(BaseAgent):
         default=MODEL_ID,
         description="The Imagen model to use for image generation.",
     )
-    imags_per_prompt: int = Field(
+    images_per_prompt: int = Field(
         default=1, description="Number of images to generate for each prompt."
     )
     output_mime_type: str = Field(
@@ -74,7 +74,7 @@ class ImagenAgent(BaseAgent):
         super().__init__(**kwargs)
         self.client = get_client()
         self.image_gen_config = dict(
-            number_of_images=self.imags_per_prompt,
+            number_of_images=self.images_per_prompt,
             output_mime_type=self.output_mime_type,
             person_generation=self.person_generation,
             aspect_ratio=self.aspect_ratio,

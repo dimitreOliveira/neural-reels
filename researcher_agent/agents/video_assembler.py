@@ -76,19 +76,20 @@ class VideoAssemblerAgent(BaseAgent):
         # Setup
         assets_path = Path(ctx.session.state.get("assets_path"))
 
-        # Available scences
+        # Available scenes
         scenes = [
             str(x) for x in assets_path.glob("*") if (x.is_dir() and "scene_" in x.name)
         ]
         scenes = sorted(scenes, key=lambda s: int(re.search(r"\d+", s).group()))
 
-        logger.info(f"[{self.name}] Found '{len(scenes)}' scences available")
+        logger.info(f"[{self.name}] Found '{len(scenes)}' scenes available")
         yield text2event(
-            self.name, f"[{self.name}] Found '{len(scenes)}' scences available"
+            self.name, f"[{self.name}] Found '{len(scenes)}' scenes available"
         )
 
-        scence_clips = []
-        for scence_idx, scene in enumerate(scenes):
+        scene_clips = []
+        for scene_idx, scene in enumerate(scenes):
+            scene_clip = None
             scene_voiceovers = list(
                 Path(f"{scene}/{self.voiceover_subdir}").glob("*.wav")
             )
@@ -104,7 +105,7 @@ class VideoAssemblerAgent(BaseAgent):
             # compose a subclip for each of scene
             for voiceover_idx, scene_voiceover in enumerate(scene_voiceovers):
                 logger.info(
-                    f"[{self.name}] Starting assembly of clip {voiceover_idx + 1} for scene '{scence_idx + 1}'"
+                    f"[{self.name}] Starting assembly of clip {voiceover_idx + 1} for scene '{scene_idx + 1}'"
                 )
                 # Load audio clip from the voiceovers
                 audio_clip = AudioFileClip(scene_voiceover)
@@ -122,7 +123,7 @@ class VideoAssemblerAgent(BaseAgent):
                         remaining_duration -= video_clip.duration
                 else:
                     logger.info(
-                        f"[{self.name}] \t No videos available for scene '{scence_idx + 1}'"
+                        f"[{self.name}] \t No videos available for scene '{scene_idx + 1}'"
                     )
 
                 if scene_images and remaining_duration > 0:
@@ -138,44 +139,44 @@ class VideoAssemblerAgent(BaseAgent):
                 else:
                     image_clips = []
                     logger.info(
-                        f"[{self.name}] \t No images available for scene '{scence_idx + 1}'"
+                        f"[{self.name}] \t No images available for scene '{scene_idx + 1}'"
                     )
 
                 if video_clips or image_clips:
                     # Concatenaten the clips
-                    scence_clip = concatenate_videoclips(
+                    scene_clip = concatenate_videoclips(
                         video_clips + image_clips, method="compose"
                     )
 
                     # Set voiceover as the clip audio
-                    scence_clip = scence_clip.with_audio(audio_clip)
+                    scene_clip = scene_clip.with_audio(audio_clip)
 
                     # Save scene clip
-                    scence_clip_outputpath = (
+                    scene_clip_outputpath = (
                         assets_path
-                        / f"scene_{scence_idx + 1}/{self.output_subdir}/voiceover_{voiceover_idx + 1}_{self.output_filename}"
+                        / f"scene_{scene_idx + 1}/{self.output_subdir}/voiceover_{voiceover_idx + 1}_{self.output_filename}"
                     )
-                    scence_clip_outputpath.parent.mkdir(parents=True, exist_ok=True)
-                    scence_clip.write_videofile(
-                        scence_clip_outputpath,
+                    scene_clip_outputpath.parent.mkdir(parents=True, exist_ok=True)
+                    scene_clip.write_videofile(
+                        scene_clip_outputpath,
                         codec=self.codec,
                         fps=self.fps,
                     )
                 else:
                     logger.info(
-                        f"[{self.name}] \t Neither videos nor images available for scene '{scence_idx + 1}'"
+                        f"[{self.name}] \t Neither videos nor images available for scene '{scene_idx + 1}'"
                     )
 
-            if scence_clip:
+            if scene_clip:
                 # Keeping the last generated clip for the sake of simplicity
-                scence_clips.append(scence_clip)
+                scene_clips.append(scene_clip)
             else:
                 logger.info(
-                    f"[{self.name}] \t Skipping scence clip for scene '{scence_idx + 1}'"
+                    f"[{self.name}] \t Skipping scene clip for scene '{scene_idx + 1}'"
                 )
 
-        # outside of this "scence loop" combine all the subclips
-        final_video_clip = concatenate_videoclips(scence_clips, method="compose")
+        # outside of this "scene loop" combine all the subclips
+        final_video_clip = concatenate_videoclips(scene_clips, method="compose")
 
         # Combine all scene clips into the final video
         final_video_outputpath = (

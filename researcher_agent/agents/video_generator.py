@@ -106,9 +106,9 @@ class VeoAgent(BaseAgent):
         and returns True if successful, False otherwise.
         """
         logger.info(
-            f"[{self.name}] Generating image for scene {scene_idx + 1} with prompt: '{prompt[:70]}...'"
+            f"[{self.name}] Generating video for scene {scene_idx + 1} with prompt: '{prompt[:70]}...'"
         )
-        yield text2event(self.name, f"Generating image for scene {scene_idx + 1}...")
+        yield text2event(self.name, f"Generating video for scene {scene_idx + 1}...")
 
         operation = self.client.models.generate_videos(
             model=self.model, prompt=prompt, config=self.video_gen_config
@@ -159,7 +159,7 @@ class VeoAgent(BaseAgent):
 
         # Setup
         assets_path = Path(ctx.session.state.get("assets_path"))
-        prompts = ctx.session.state.get(self.input_key).get(self.input_key)[:1]  # TEMP
+        prompts = ctx.session.state.get(self.input_key).get(self.input_key)
 
         if not prompts:
             error_msg = (
