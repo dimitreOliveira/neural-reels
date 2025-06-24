@@ -27,7 +27,7 @@ Create only a single image prompt for each scene.
 """
 
 
-class ImagePromptsOutput(BaseModel):
+class ImagePromptGeneratorOutput(BaseModel):
     image_prompts: list[str] = Field(
         description="The image generation prompts used to generate the images for the short video content."
     )
@@ -40,6 +40,6 @@ image_prompt_generator_agent = Agent(
     model=MODEL_ID,
     include_contents="none",
     output_key="image_prompts",
-    output_schema=ImagePromptsOutput,
+    output_schema=ImagePromptGeneratorOutput,
     after_agent_callback=save_agent_output,
 )

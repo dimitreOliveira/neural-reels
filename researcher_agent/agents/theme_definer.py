@@ -26,7 +26,7 @@ You may handle any other request or interactions with the user but make sure to 
 """
 
 
-class ThemeOutput(BaseModel):
+class ThemeDefinerAgentOutput(BaseModel):
     theme: str = Field(
         description="The theme of the short video content provided by the user."
     )
@@ -38,5 +38,5 @@ theme_definer_agent = Agent(
     instruction=THEME_DEFINER_PROMPT,
     model=MODEL_ID,
     output_key="theme",
-    output_schema=ThemeOutput,
+    output_schema=ThemeDefinerAgentOutput,
 )

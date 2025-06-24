@@ -11,17 +11,16 @@ def save_agent_output(callback_context: CallbackContext) -> Optional[types.Conte
     output_dir = Path(current_state.get("assets_path", "projects/default"))
     output_dir.mkdir(exist_ok=True, parents=True)
 
-    output_key = list(current_state.keys())[-1]
-    agent_response = current_state[output_key]
-
-    # Save json output
-    if isinstance(agent_response, dict):
-        response_filename = output_dir / f"{output_key}.json"
-        with open(response_filename, "w") as file:
-            json.dump(agent_response, file, indent=4)
-    # Save text output
-    else:
-        response_filename = output_dir / f"{output_key}.md"
-        response_filename.write_text(agent_response)
+    # Persist the current state
+    for key, value in current_state.items():
+        # Save json output
+        if isinstance(value, dict):
+            response_filename = output_dir / f"{key}.json"
+            with open(response_filename, "w") as file:
+                json.dump(value, file, indent=4)
+        # Save text output
+        else:
+            response_filename = output_dir / f"{key}.md"
+            response_filename.write_text(value)
 
     return None

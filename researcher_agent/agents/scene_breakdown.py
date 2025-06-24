@@ -26,7 +26,7 @@ The output should be a list of strings, where each string is the text for one sc
 """
 
 
-class SceneBreakdownOutput(BaseModel):
+class SceneBreakdownAgentOutput(BaseModel):
     scenes: list[str] = Field(
         description="A list of strings, where each string is the text for a scene from the script."
     )
@@ -39,6 +39,6 @@ scene_breakdown_agent = Agent(
     model=MODEL_ID,
     include_contents="none",
     output_key="scenes",
-    output_schema=SceneBreakdownOutput,
+    output_schema=SceneBreakdownAgentOutput,
     after_agent_callback=save_agent_output,
 )

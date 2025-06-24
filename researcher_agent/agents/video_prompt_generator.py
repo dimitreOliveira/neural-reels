@@ -27,7 +27,7 @@ Create only a single video prompt for each scene.
 """
 
 
-class VideoPromptsOutput(BaseModel):
+class VideoPromptGeneratorAgentOutput(BaseModel):
     video_prompts: list[str] = Field(
         description="The video generation prompts used to generate the videos for the short video content."
     )
@@ -40,6 +40,6 @@ video_prompt_generator_agent = Agent(
     model=MODEL_ID,
     include_contents="none",
     output_key="video_prompts",
-    output_schema=VideoPromptsOutput,
+    output_schema=VideoPromptGeneratorAgentOutput,
     after_agent_callback=save_agent_output,
 )
