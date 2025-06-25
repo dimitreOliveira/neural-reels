@@ -40,12 +40,6 @@ from researcher_agent.agents.voiceover_generator import (
 )
 from researcher_agent.utils.genai_utils import text2event
 
-theme_definition_prompt = "\n\nIt seems that you want to create a short video content about '{theme}' is this correct?\nAnswer with 'yes' or describe what theme you want."
-user_feedback_prompt = "\n\nDo you approve this script?\nAnswer with 'yes' or 'no' or provide feedback for improvement."
-script_approved_msg = "\n\nScript approved, starting the video generation process."
-assets_folder_msg = "\n\nGenerated assets will be stored at: '{assets_path}'."
-workflow_finished_msg = "\n\nShort video content creation workflow finished. Video stored at: '{assets_path}'."
-
 
 class WorkflowStage(Enum):
     THEME_DEFINITION = 1
@@ -73,8 +67,7 @@ class VideoCreatorWorkflowAgent(BaseAgent):
     image_generator: ImagenAgent
     video_generator: VeoAgent
     video_assembler: VideoAssemblerAgent
-    # workflow_stage: WorkflowStage = WorkflowStage.THEME_DEFINITION
-    workflow_stage: WorkflowStage = WorkflowStage.VIDEO_CREATION
+    workflow_stage: WorkflowStage = WorkflowStage.THEME_DEFINITION
     theme_approved: bool = False
     script_approved: bool = False
 
@@ -150,13 +143,12 @@ class VideoCreatorWorkflowAgent(BaseAgent):
             yield event
 
         # 2. Ask for user feedback
+        theme = ctx.session.state[self.theme_definer.output_key].get(
+            self.theme_definer.output_key
+        )
         yield text2event(
             self.name,
-            theme_definition_prompt.format(
-                theme=ctx.session.state[self.theme_definer.output_key].get(
-                    self.theme_definer.output_key
-                )
-            ),
+            f"It seems that you want to create a short video content about '{theme}' is this correct?\nAnswer with 'yes' or describe what theme you want.",
         )
 
         self.theme_approved = True
@@ -173,7 +165,10 @@ class VideoCreatorWorkflowAgent(BaseAgent):
         ).get(self.script_writer.output_key)
 
         # 2. Ask for user feedback
-        yield text2event(self.name, user_feedback_prompt)
+        yield text2event(
+            self.name,
+            "Do you approve this script?\nAnswer with 'yes' or 'no' or provide feedback for improvement.",
+        )
         self.script_approved = True
 
     async def _setup_assets_folder(
@@ -226,7 +221,7 @@ class VideoCreatorWorkflowAgent(BaseAgent):
                 else:
                     self.workflow_stage = WorkflowStage.SCRIPT_REFINEMENT
                     yield text2event(
-                        self.name, "Theme approved moving to script refinement stage."
+                        self.name, "Theme approved moving to script refinement stage"
                     )
 
                     async for event in self._setup_assets_folder(ctx):
@@ -256,7 +251,7 @@ class VideoCreatorWorkflowAgent(BaseAgent):
             else:
                 self.workflow_stage = WorkflowStage.VIDEO_CREATION
                 yield text2event(
-                    self.name, "Script approved moving to video creation stage."
+                    self.name, "Script approved, starting the video generation process."
                 )
         elif self.workflow_stage == WorkflowStage.VIDEO_CREATION:
             # 5. Scene breakdown
@@ -264,15 +259,11 @@ class VideoCreatorWorkflowAgent(BaseAgent):
                 yield event
 
             # 6. Image prompts generation
-            async for event in self._run_sub_agent(
-                self.image_prompt_generator, ctx
-            ):
+            async for event in self._run_sub_agent(self.image_prompt_generator, ctx):
                 yield event
 
             # 7. Video prompts generation
-            async for event in self._run_sub_agent(
-                self.video_prompt_generator, ctx
-            ):
+            async for event in self._run_sub_agent(self.video_prompt_generator, ctx):
                 yield event
 
             # 8. Voiceover generation
@@ -291,11 +282,10 @@ class VideoCreatorWorkflowAgent(BaseAgent):
             async for event in self._run_sub_agent(self.video_assembler, ctx):
                 yield event
 
-            _workflow_finished_msg = workflow_finished_msg.format(
-                assets_path=ctx.session.state["assets_path"]
+            yield text2event(
+                self.name,
+                f"Short video content creation workflow finished. Video stored at: '{ctx.session.state['assets_path']}'.",
             )
-            yield text2event(self.name, _workflow_finished_msg)
-            logger.info(_workflow_finished_msg)
 
             logger.info(
                 f"\n\n[{self.name}] Finishing short content video creation workflow.\n\n"
