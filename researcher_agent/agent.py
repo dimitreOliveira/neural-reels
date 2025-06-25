@@ -73,7 +73,8 @@ class VideoCreatorWorkflowAgent(BaseAgent):
     image_generator: ImagenAgent
     video_generator: VeoAgent
     video_assembler: VideoAssemblerAgent
-    workflow_stage: WorkflowStage = WorkflowStage.THEME_DEFINITION
+    # workflow_stage: WorkflowStage = WorkflowStage.THEME_DEFINITION
+    workflow_stage: WorkflowStage = WorkflowStage.VIDEO_CREATION
     theme_approved: bool = False
     script_approved: bool = False
 
@@ -179,7 +180,9 @@ class VideoCreatorWorkflowAgent(BaseAgent):
         self, ctx: InvocationContext
     ) -> AsyncGenerator[Event, None]:
         theme_output = ctx.session.state[self.theme_definer.output_key]
-        theme = theme_output[self.theme_definer.output_key] if theme_output else "default"
+        theme = (
+            theme_output[self.theme_definer.output_key] if theme_output else "default"
+        )
 
         assets_path = f"projects/{theme}".lower().replace(" ", "_")
         # set the theme as the output folder
@@ -288,7 +291,9 @@ class VideoCreatorWorkflowAgent(BaseAgent):
             async for event in self._run_sub_agent(self.video_assembler, ctx):
                 yield event
 
-            _workflow_finished_msg = workflow_finished_msg.format(assets_path=ctx.session.state["assets_path"])
+            _workflow_finished_msg = workflow_finished_msg.format(
+                assets_path=ctx.session.state["assets_path"]
+            )
             yield text2event(self.name, _workflow_finished_msg)
             logger.info(_workflow_finished_msg)
 
