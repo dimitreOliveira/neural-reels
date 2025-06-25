@@ -1,17 +1,21 @@
 import logging
+import random
 import re
 from pathlib import Path
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional
 
+import numpy as np
 from google.adk.agents import BaseAgent
 from google.adk.agents.invocation_context import InvocationContext
 from google.adk.events import Event
 from moviepy import (
     AudioFileClip,
+    CompositeVideoClip,
     ImageClip,
     VideoFileClip,
     concatenate_videoclips,
 )
+from moviepy.video.fx import TimeMirror
 from pydantic import Field
 from typing_extensions import override
 
@@ -67,6 +71,135 @@ class VideoAssemblerAgent(BaseAgent):
 
     model_config = {"arbitrary_types_allowed": True}
 
+    def _apply_random_effect_to_img(self, image_clip: ImageClip) -> CompositeVideoClip:
+        """
+        Applies a random visual effect to an ImageClip and finalizes its properties.
+        """
+        effects_with_names = [
+            ("No effect", lambda clip: clip.resized(lambda t: 1)),
+            ("Zoom-in (very slow)", lambda clip: clip.resized(lambda t: 1 + 0.01 * t)),
+            ("Zoom-in (slow)", lambda clip: clip.resized(lambda t: 1 + 0.03 * t)),
+            ("Zoom-in (fast)", lambda clip: clip.resized(lambda t: 1 + 0.06 * t)),
+            (
+                "Zoom-in (sin-based)",
+                lambda clip: clip.resized(lambda t: 1.3 + 0.3 * np.sin(t / 3)),
+            ),
+        ]
+
+        # Choose a random effect
+        effect_name, chosen_effect_func = random.choice(effects_with_names)
+        logger.info(f"[{self.name}] Applying effect: '{effect_name}' to image clip.")
+
+        # Apply the chosen effect
+        try:
+            image_clip = chosen_effect_func(image_clip)
+        except Exception as e:
+            logger.warning(
+                f"[{self.name}] Failed to apply effect '{effect_name}': {e}. Skipping effect.",
+                exc_info=True,
+            )
+            # Fallback to no effect if the chosen one fails
+            pass
+
+        image_clip = image_clip.with_position(("center", "center"))
+        image_clip.fps = self.fps
+        image_clip = CompositeVideoClip([image_clip], size=image_clip.size)
+
+        reverse_clip = random.choice([True, False])
+        if reverse_clip:
+            image_clip = TimeMirror().apply(image_clip)
+            logger.info(f"[{self.name}] Applying effect: 'reverse' to image clip.")
+
+        return image_clip
+
+    def _assemble_scene_clip(
+        self, scene_idx: int, scene: str, assets_path: Path
+    ) -> Optional[CompositeVideoClip]:
+        """Assembles a single scene's video clip from its assets."""
+        scene_clip = None
+        scene_voiceovers = list(Path(f"{scene}/{self.voiceover_subdir}").glob("*.wav"))
+        scene_images = list(Path(f"{scene}/{self.images_subdir}").glob("*.jpg"))
+        scene_videos = list(Path(f"{scene}/{self.videos_subdir}").glob("*.mp4"))
+
+        logger.info(f"[{self.name}] \t {len(scene_voiceovers)} voiceover(s) available")
+        logger.info(f"[{self.name}] \t {len(scene_images)} image(s) available")
+        logger.info(f"[{self.name}] \t {len(scene_videos)} video(s) available")
+
+        # compose a subclip for each of scene
+        for voiceover_idx, scene_voiceover in enumerate(scene_voiceovers):
+            logger.info(
+                f"[{self.name}] Starting assembly of clip {voiceover_idx + 1} for scene '{scene_idx + 1}'"
+            )
+            # Load audio clips from the voiceovers
+            audio_clip = AudioFileClip(str(scene_voiceover))
+            # Load video clips from the videos
+            video_clips = [
+                VideoFileClip(str(video_path)) for video_path in scene_videos
+            ]
+            # Load image clips from the images
+            image_clips = [ImageClip(str(img_path)) for img_path in scene_images]
+
+            # Prioritize using videos if available
+            remaining_duration = audio_clip.duration
+            logger.info(f"[{self.name}] \t Voiceover duration {audio_clip.duration}")
+            if video_clips:
+                remaining_duration -= sum(
+                    video_clip.duration for video_clip in video_clips
+                )
+            else:
+                logger.info(
+                    f"[{self.name}] \t No videos available for scene '{scene_idx + 1}'"
+                )
+
+            if image_clips and remaining_duration > 0:
+                image_duration_per_clip = remaining_duration / len(image_clips)
+                logger.info(
+                    f"[{self.name}] \t image_duration_per_clip {image_duration_per_clip}"
+                )
+                # Update image clips durations based on the remaining clip duration
+                image_clips = [
+                    image_clip.with_duration(image_duration_per_clip)
+                    for image_clip in image_clips
+                ]
+                # Add random effect to image clips
+                image_clips = [
+                    self._apply_random_effect_to_img(img_clip)
+                    for img_clip in image_clips
+                ]
+            else:
+                # TODO: If there are not images and we still need audio to fill,
+                # we need to extend the duration of the available videos
+                image_clips = []
+                logger.info(
+                    f"[{self.name}] \t No images available for scene '{scene_idx + 1}'."
+                )
+
+            if video_clips or image_clips:
+                # Concatenaten the clips
+                scene_clip = concatenate_videoclips(
+                    video_clips + image_clips, method="compose"
+                )
+
+                # Set voiceover as the clip audio
+                scene_clip = scene_clip.with_audio(audio_clip)
+
+                # Save scene clip
+                scene_clip_outputpath = (
+                    assets_path
+                    / f"scene_{scene_idx + 1}/{self.output_subdir}/voiceover_{voiceover_idx + 1}_{self.output_filename}"
+                )
+                scene_clip_outputpath.parent.mkdir(parents=True, exist_ok=True)
+                scene_clip.write_videofile(
+                    str(scene_clip_outputpath),
+                    codec=self.codec,
+                    fps=self.fps,
+                )
+            else:
+                logger.info(
+                    f"[{self.name}] \t Neither videos nor images available for scene '{scene_idx + 1}'"
+                )
+        return scene_clip
+
     @override
     async def _run_async_impl(
         self, ctx: InvocationContext
@@ -89,83 +222,7 @@ class VideoAssemblerAgent(BaseAgent):
 
         scene_clips = []
         for scene_idx, scene in enumerate(scenes):
-            scene_clip = None
-            scene_voiceovers = list(
-                Path(f"{scene}/{self.voiceover_subdir}").glob("*.wav")
-            )
-            scene_images = list(Path(f"{scene}/{self.images_subdir}").glob("*.jpg"))
-            scene_videos = list(Path(f"{scene}/{self.videos_subdir}").glob("*.mp4"))
-
-            logger.info(
-                f"[{self.name}] \t {len(scene_voiceovers)} voiceover(s) available"
-            )
-            logger.info(f"[{self.name}] \t {len(scene_images)} image(s) available")
-            logger.info(f"[{self.name}] \t {len(scene_videos)} video(s) available")
-
-            # compose a subclip for each of scene
-            for voiceover_idx, scene_voiceover in enumerate(scene_voiceovers):
-                logger.info(
-                    f"[{self.name}] Starting assembly of clip {voiceover_idx + 1} for scene '{scene_idx + 1}'"
-                )
-                # Load audio clip from the voiceovers
-                audio_clip = AudioFileClip(scene_voiceover)
-                # Load video clips from the videos
-                video_clips = [
-                    VideoFileClip(str(video_path)) for video_path in scene_videos
-                ]
-                # Prioritize using videos if available
-                remaining_duration = audio_clip.duration
-                logger.info(
-                    f"[{self.name}] \t Voiceover duration {audio_clip.duration}"
-                )
-                if scene_videos:
-                    for video_clip in video_clips:
-                        remaining_duration -= video_clip.duration
-                else:
-                    logger.info(
-                        f"[{self.name}] \t No videos available for scene '{scene_idx + 1}'"
-                    )
-
-                if scene_images and remaining_duration > 0:
-                    image_duration_per_clip = remaining_duration / len(scene_images)
-                    logger.info(
-                        f"[{self.name}] \t image_duration_per_clip {image_duration_per_clip}"
-                    )
-                    # Load image clips from the images (based on the remaining clip duration)
-                    image_clips = [
-                        ImageClip(str(img_path), duration=image_duration_per_clip)
-                        for img_path in scene_images
-                    ]
-                else:
-                    image_clips = []
-                    logger.info(
-                        f"[{self.name}] \t No images available for scene '{scene_idx + 1}'"
-                    )
-
-                if video_clips or image_clips:
-                    # Concatenaten the clips
-                    scene_clip = concatenate_videoclips(
-                        video_clips + image_clips, method="compose"
-                    )
-
-                    # Set voiceover as the clip audio
-                    scene_clip = scene_clip.with_audio(audio_clip)
-
-                    # Save scene clip
-                    scene_clip_outputpath = (
-                        assets_path
-                        / f"scene_{scene_idx + 1}/{self.output_subdir}/voiceover_{voiceover_idx + 1}_{self.output_filename}"
-                    )
-                    scene_clip_outputpath.parent.mkdir(parents=True, exist_ok=True)
-                    scene_clip.write_videofile(
-                        scene_clip_outputpath,
-                        codec=self.codec,
-                        fps=self.fps,
-                    )
-                else:
-                    logger.info(
-                        f"[{self.name}] \t Neither videos nor images available for scene '{scene_idx + 1}'"
-                    )
+            scene_clip = self._assemble_scene_clip(scene_idx, scene, assets_path)
 
             if scene_clip:
                 # Keeping the last generated clip for the sake of simplicity
@@ -184,12 +241,12 @@ class VideoAssemblerAgent(BaseAgent):
         )
         final_video_outputpath.parent.mkdir(parents=True, exist_ok=True)
         final_video_clip.write_videofile(
-            final_video_outputpath,
+            str(final_video_outputpath),
             codec=self.codec,
             fps=self.fps,
         )
 
-        ctx.session.state[self.output_key] = final_video_outputpath
+        ctx.session.state[self.output_key] = str(final_video_outputpath)
         completion_msg = (
             f"Video assembly finished. Video stored at: '{final_video_outputpath}'"
         )
