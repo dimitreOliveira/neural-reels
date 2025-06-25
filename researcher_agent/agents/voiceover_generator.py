@@ -1,5 +1,5 @@
 import logging
-import os
+from pathlib import Path
 from typing import AsyncGenerator
 
 from google import genai
@@ -13,7 +13,6 @@ from typing_extensions import override
 from researcher_agent.utils.audio_utils import save_wave_file
 from researcher_agent.utils.genai_utils import (
     get_client,
-    get_generate_content_config,
     text2event,
 )
 
@@ -43,16 +42,16 @@ class VoiceoverGeneratorAgent(BaseAgent):
         description="The description of the agent.",
     )
     input_key: str = Field(
-        default="script",
-        description="The key in the session state holding the text prompt to convert to speech.",
+        default="scenes",
+        description="The key in the session state holding the list of text prompts to convert to speech, one for each scene.",
     )
     output_key: str = Field(
-        default="voiceover_path",
-        description="The key in the session state to store the path of the saved audio file.",
+        default="voiceovers_path",
+        description="The key in the session state to store the path of the directory where generated audio files are saved.",
     )
-    output_filename: str = Field(
-        default="generated_audio.wav",
-        description="The path and filename to save the generated WAV audio file.",
+    output_subdir: str = Field(
+        default="voiceovers",
+        description="The subdirectory within the assets path to save the generated WAV audio files.",
     )
     # --- Gemini-specific configuration ---
     model: str = Field(
@@ -64,13 +63,45 @@ class VoiceoverGeneratorAgent(BaseAgent):
         description="The name of the prebuilt voice to use for speech generation.",
     )
 
-    # This allows Pydantic to manage the model without extra config
     model_config = {"arbitrary_types_allowed": True}
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.client = get_client()
-        self.generate_content_config = get_generate_content_config(self.voice_name)
+        self.generate_content_config = types.GenerateContentConfig(
+            response_modalities=["AUDIO"],
+            speech_config=types.SpeechConfig(
+                voice_config=types.VoiceConfig(
+                    prebuilt_voice_config=types.PrebuiltVoiceConfig(
+                        voice_name=self.voice_name,
+                    )
+                )
+            ),
+        )
+
+    async def _generate_audio(
+        self, scene_idx: int, prompt: str, output_dir: Path
+    ) -> AsyncGenerator[Event, None]:
+        """
+        Generates audio for a single prompt (scene) and saves it.
+        """
+        logger.info(
+            f"[{self.name}] Generating audio for scene {scene_idx + 1} with prompt: '{prompt[:70]}...'"
+        )
+        yield text2event(self.name, f"Generating audio for scene {scene_idx + 1}...")
+        response = self.client.models.generate_content(
+            model=self.model,
+            contents=prompt,
+            config=self.generate_content_config,
+        )
+
+        audio_data = response.candidates[0].content.parts[0].inline_data.data
+        output_filepath = str(output_dir / "voiceover.wav")
+        save_wave_file(output_filepath, audio_data)
+
+        logger.info(
+            f"[{self.name}] Audio for scene {scene_idx + 1} generated and saved to '{output_filepath}'."
+        )
 
     @override
     async def _run_async_impl(
@@ -79,17 +110,13 @@ class VoiceoverGeneratorAgent(BaseAgent):
         """
         The core implementation of the agent's logic.
         """
-        logger.info(f"[{self.name}] Starting TTS generation.")
+        logger.info(f"[{self.name}] Starting voiceover generation for multiple scenes.")
 
         # Setup
-        assets_path = ctx.session.state.get("assets_path")
-        output_filepath = os.path.join(assets_path, self.output_filename)
+        assets_path = Path(ctx.session.state.get("assets_path"))
+        prompts = ctx.session.state.get(self.input_key).get(self.input_key)
 
-        # 1. Get the text prompt from the session state
-        script_container = ctx.session.state.get(self.input_key)
-        prompt_to_speak = script_container.script if script_container else ""
-
-        if not prompt_to_speak:
+        if not prompts:
             error_msg = (
                 f"Input key '{self.input_key}' not found in session state. Aborting."
             )
@@ -98,32 +125,21 @@ class VoiceoverGeneratorAgent(BaseAgent):
             return
 
         logger.info(
-            f"[{self.name}] Received text to speak: '{prompt_to_speak[:50]}...'"
+            f"[{self.name}] Received {len(prompts)} prompt(s) for voiceover generation."
         )
+        logger.info(f"[{self.name}] Calling Gemini API with model '{self.model}'...")
 
         try:
-            # 2. Call the Gemini API to generate audio content
-            logger.info(
-                f"[{self.name}] Calling Gemini API with model '{self.model}'..."
-            )
-            response = self.client.models.generate_content(
-                model=self.model,
-                contents=prompt_to_speak,
-                config=self.generate_content_config,
-            )
+            ctx.session.state[self.output_key] = []
+            for scene_idx, prompt in enumerate(prompts):
+                output_dir = assets_path / f"scene_{scene_idx + 1}" / self.output_subdir
+                output_dir.mkdir(parents=True, exist_ok=True)
+                ctx.session.state[self.output_key].append(str(output_dir))
 
-            # 3. Extract audio data and save it to a WAV file
-            audio_data = response.candidates[0].content.parts[0].inline_data.data
-            save_wave_file(output_filepath, audio_data)
+                async for event in self._generate_audio(scene_idx, prompt, output_dir):
+                    yield event
 
-            # 4. Store the output filename in the session state using `self.output_key`
-            ctx.session.state[self.output_key] = self.output_filename
-            logger.info(
-                f"[{self.name}] Stored output path '{output_filepath}' in session state key '{self.output_key}'."
-            )
-
-            # 5. Yield a response event to signal completion
-            final_message = f"Audio generated and saved to '{output_filepath}'."
+            final_message = f"Voiceovers generated and saved to '{output_dir}'."
             yield text2event(self.name, final_message)
 
         except Exception as e:
@@ -134,10 +150,10 @@ class VoiceoverGeneratorAgent(BaseAgent):
 
 voiceover_generator_agent = VoiceoverGeneratorAgent(
     name="VoiceoverGeneratorAgent",
-    description="Generates a voiceover audio from text.",
+    description="Generates voiceover audio files from a list of text scripts, one for each scene.",
     model=MODEL_ID,
     voice_name=VOICE_NAME,
-    input_key="script",
-    output_key="voiceover_path",
-    output_filename="voiceover.wav",
+    input_key="scenes",
+    output_key="voiceovers_path",
+    output_subdir="voiceovers",
 )

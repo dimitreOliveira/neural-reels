@@ -6,20 +6,20 @@ from researcher_agent.callbacks.callbacks import save_agent_output
 MODEL_ID = "gemini-2.5-flash"
 
 SCRIPT_WRITER_PROMPT = """
-Based on the user's input and the provided theme '{theme}', and , write a short content video script.
+Based on the user's input, write a short content video script.
 The script should be engaging, concise, and suitable for a 1~2 minutes video.
 This script must contain only the text narration.
-
 The script must contain only the text and no text artifacts.
 
-If the user approves it or if you don't know how to handle the request handle it back the to the orchestrator [OrchestratorAgent],
-other wise iterate with the user to update the result.
+You may need to iterate over this script, below you can find the current version, if it exsits:
+{current_script?}
 
-The script must have a max of 100 chars.
+Here you can see the user's feedback, if it exsits, that must be incorporated for the next iteration:
+{user_input?}
 """
 
 
-class ScriptOutput(BaseModel):
+class ScriptWriterAgentOutput(BaseModel):
     script: str = Field(description="The script of the short video content.")
 
 
@@ -29,8 +29,6 @@ script_writer_agent = Agent(
     instruction=SCRIPT_WRITER_PROMPT,
     model=MODEL_ID,
     output_key="script",
-    output_schema=ScriptOutput,
-    disallow_transfer_to_parent=True,
-    disallow_transfer_to_peers=True,
+    output_schema=ScriptWriterAgentOutput,
     after_agent_callback=save_agent_output,
 )

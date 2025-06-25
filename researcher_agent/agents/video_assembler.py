@@ -1,4 +1,5 @@
 import logging
+import re
 from pathlib import Path
 from typing import AsyncGenerator
 
@@ -33,29 +34,20 @@ class VideoAssemblerAgent(BaseAgent):
         default="Assembles video clips, images, and audio into a final video.",
         description="The description of the agent.",
     )
-
     # --- Input keys from session state ---
-    voiceover_file_input_key: str = Field(
-        default="voiceover_path",
+    voiceover_subdir: str = Field(
+        default="voiceovers",
         description="Key in session state for the voiceover audio filename (from VoiceoverGeneratorAgent).",
     )
-    images_dir_input_key: str = Field(
-        default="images_path",
+    images_subdir: str = Field(
+        default="images",
         description="Key in session state for the directory containing image files (from ImageGeneratorAgent).",
     )
-    videos_dir_input_key: str = Field(
-        default="videos_path",
+    videos_subdir: str = Field(
+        default="videos",
         description="Key in session state for the directory containing intro/outro videos (from VideoGeneratorAgent).",
     )
     # --- Configuration for specific asset names and output ---
-    intro_video_filename: str = Field(
-        default="intro_video_0.mp4",
-        description="Filename of the intro video within the videos directory.",
-    )
-    outro_video_filename: str = Field(
-        default="outro_video_0.mp4",
-        description="Filename of the outro video within the videos directory.",
-    )
     output_key: str = Field(
         default="assembled_video_path",
         description="Key in session state to store the path of the assembled video file.",
@@ -69,8 +61,10 @@ class VideoAssemblerAgent(BaseAgent):
         description="Filename for the assembled video.",
     )
     fps: int = Field(default=24, description="Frames per second for the output video.")
+    codec: str = Field(
+        default="libx264", description="Video codec for the output video."
+    )
 
-    # This allows Pydantic to manage the model without extra config
     model_config = {"arbitrary_types_allowed": True}
 
     @override
@@ -81,158 +75,135 @@ class VideoAssemblerAgent(BaseAgent):
 
         # Setup
         assets_path = Path(ctx.session.state.get("assets_path"))
-        output_dir = assets_path / self.output_subdir
-        output_dir.mkdir(parents=True, exist_ok=True)
-        final_video_filepath = output_dir / self.output_filename
-        ctx.session.state[self.output_key] = str(final_video_filepath)
-        logger.info(
-            f"[{self.name}] Stored final video path '{final_video_filepath}' in session state key '{self.output_key}'."
+
+        # Available scenes
+        scenes = [
+            str(x) for x in assets_path.glob("*") if (x.is_dir() and "scene_" in x.name)
+        ]
+        scenes = sorted(scenes, key=lambda s: int(re.search(r"\d+", s).group()))
+
+        logger.info(f"[{self.name}] Found '{len(scenes)}' scenes available")
+        yield text2event(
+            self.name, f"[{self.name}] Found '{len(scenes)}' scenes available"
         )
 
-        try:
-            # 1. Get asset paths from session state
-            videos_base_dir_str = ctx.session.state.get(self.videos_dir_input_key)
-            images_dir_str = ctx.session.state.get(self.images_dir_input_key)
-            voiceover_filename_in_state = ctx.session.state.get(
-                self.voiceover_file_input_key
+        scene_clips = []
+        for scene_idx, scene in enumerate(scenes):
+            scene_clip = None
+            scene_voiceovers = list(
+                Path(f"{scene}/{self.voiceover_subdir}").glob("*.wav")
             )
+            scene_images = list(Path(f"{scene}/{self.images_subdir}").glob("*.jpg"))
+            scene_videos = list(Path(f"{scene}/{self.videos_subdir}").glob("*.mp4"))
 
-            if not all(
-                [videos_base_dir_str, images_dir_str, voiceover_filename_in_state]
-            ):
-                missing_keys = [
-                    key
-                    for key, val in {
-                        self.videos_dir_input_key: videos_base_dir_str,
-                        self.images_dir_input_key: images_dir_str,
-                        self.voiceover_file_input_key: voiceover_filename_in_state,
-                    }.items()
-                    if not val
-                ]
-                error_msg = f"Missing required input keys in session state: {', '.join(missing_keys)}. Aborting."
-                logger.error(f"[{self.name}] {error_msg}")
-                yield text2event(self.name, error_msg)
-                return
+            logger.info(
+                f"[{self.name}] \t {len(scene_voiceovers)} voiceover(s) available"
+            )
+            logger.info(f"[{self.name}] \t {len(scene_images)} image(s) available")
+            logger.info(f"[{self.name}] \t {len(scene_videos)} video(s) available")
 
-            videos_dir = Path(videos_base_dir_str)
-            images_dir = Path(images_dir_str)
-            voiceover_audio_path = assets_path / voiceover_filename_in_state
-
-            intro_video_path = videos_dir / self.intro_video_filename
-            outro_video_path = videos_dir / self.outro_video_filename
-
-            # Validate file existence
-            for p, desc in [
-                (intro_video_path, "Intro video"),
-                (outro_video_path, "Outro video"),
-                (voiceover_audio_path, "Voiceover audio"),
-            ]:
-                if not p.is_file():
-                    error_msg = f"{desc} not found at {p}. Aborting."
-                    logger.error(f"[{self.name}] {error_msg}")
-                    yield text2event(self.name, error_msg)
-                    return
-            if not images_dir.is_dir():
-                error_msg = f"Images directory not found at {images_dir}. Aborting."
-                logger.error(f"[{self.name}] {error_msg}")
-                yield text2event(self.name, error_msg)
-                return
-
-            yield text2event(self.name, "Loading assets for video assembly...")
-            intro_clip = VideoFileClip(str(intro_video_path))
-            outro_clip = VideoFileClip(str(outro_video_path))
-            audio_clip = AudioFileClip(str(voiceover_audio_path))
-
-            image_files = sorted(list(images_dir.glob("*.jpg")))
-            image_clips = []
-            if image_files:
-                yield text2event(
-                    self.name, f"Found {len(image_files)} images for the sequence."
+            # compose a subclip for each of scene
+            for voiceover_idx, scene_voiceover in enumerate(scene_voiceovers):
+                logger.info(
+                    f"[{self.name}] Starting assembly of clip {voiceover_idx + 1} for scene '{scene_idx + 1}'"
                 )
-                intro_duration = intro_clip.duration or 0
-                outro_duration = outro_clip.duration or 0
-                audio_duration = audio_clip.duration or 0
-
-                remaining_duration = audio_duration - (intro_duration + outro_duration)
-                image_duration_per_clip = 0.1  # Default small duration
-
-                if remaining_duration > 0 and image_files:
-                    image_duration_per_clip = remaining_duration / len(image_files)
-                elif image_files:  # remaining_duration <= 0 but images exist
-                    logger.warning(
-                        f"[{self.name}] Not enough audio duration for images or negative remaining duration ({remaining_duration:.2f}s). Using default duration {image_duration_per_clip}s per image."
+                # Load audio clip from the voiceovers
+                audio_clip = AudioFileClip(scene_voiceover)
+                # Load video clips from the videos
+                video_clips = [
+                    VideoFileClip(str(video_path)) for video_path in scene_videos
+                ]
+                # Prioritize using videos if available
+                remaining_duration = audio_clip.duration
+                logger.info(
+                    f"[{self.name}] \t Voiceover duration {audio_clip.duration}"
+                )
+                if scene_videos:
+                    for video_clip in video_clips:
+                        remaining_duration -= video_clip.duration
+                else:
+                    logger.info(
+                        f"[{self.name}] \t No videos available for scene '{scene_idx + 1}'"
                     )
 
-                logger.info(
-                    f"[{self.name}] Duration per image clip: {image_duration_per_clip:.2f} seconds"
-                )
-                image_clips = [
-                    ImageClip(str(img_path), duration=image_duration_per_clip)
-                    for img_path in image_files
-                ]
+                if scene_images and remaining_duration > 0:
+                    image_duration_per_clip = remaining_duration / len(scene_images)
+                    logger.info(
+                        f"[{self.name}] \t image_duration_per_clip {image_duration_per_clip}"
+                    )
+                    # Load image clips from the images (based on the remaining clip duration)
+                    image_clips = [
+                        ImageClip(str(img_path), duration=image_duration_per_clip)
+                        for img_path in scene_images
+                    ]
+                else:
+                    image_clips = []
+                    logger.info(
+                        f"[{self.name}] \t No images available for scene '{scene_idx + 1}'"
+                    )
+
+                if video_clips or image_clips:
+                    # Concatenaten the clips
+                    scene_clip = concatenate_videoclips(
+                        video_clips + image_clips, method="compose"
+                    )
+
+                    # Set voiceover as the clip audio
+                    scene_clip = scene_clip.with_audio(audio_clip)
+
+                    # Save scene clip
+                    scene_clip_outputpath = (
+                        assets_path
+                        / f"scene_{scene_idx + 1}/{self.output_subdir}/voiceover_{voiceover_idx + 1}_{self.output_filename}"
+                    )
+                    scene_clip_outputpath.parent.mkdir(parents=True, exist_ok=True)
+                    scene_clip.write_videofile(
+                        scene_clip_outputpath,
+                        codec=self.codec,
+                        fps=self.fps,
+                    )
+                else:
+                    logger.info(
+                        f"[{self.name}] \t Neither videos nor images available for scene '{scene_idx + 1}'"
+                    )
+
+            if scene_clip:
+                # Keeping the last generated clip for the sake of simplicity
+                scene_clips.append(scene_clip)
             else:
                 logger.info(
-                    f"[{self.name}] No image files found in {images_dir} or remaining duration is not positive."
+                    f"[{self.name}] \t Skipping scene clip for scene '{scene_idx + 1}'"
                 )
 
-            yield text2event(self.name, "Concatenating video clips...")
-            clips_to_concatenate = [intro_clip] + image_clips + [outro_clip]
-            final_video_clip = concatenate_videoclips(
-                clips_to_concatenate, method="compose"
-            )
+        # outside of this "scene loop" combine all the subclips
+        final_video_clip = concatenate_videoclips(scene_clips, method="compose")
 
-            yield text2event(self.name, "Setting audio for the final video...")
-            final_video_clip = final_video_clip.with_audio(audio_clip)
-            if (
-                final_video_clip.duration > audio_clip.duration + 0.1
-            ):  # Add small tolerance
-                logger.warning(
-                    f"[{self.name}] Final video duration ({final_video_clip.duration:.2f}s) is longer than audio duration ({audio_clip.duration:.2f}s)."
-                )
-            elif final_video_clip.duration < audio_clip.duration - 0.1:
-                logger.warning(
-                    f"[{self.name}] Final video duration ({final_video_clip.duration:.2f}s) is shorter than audio duration ({audio_clip.duration:.2f}s). Video may end before audio does."
-                )
+        # Combine all scene clips into the final video
+        final_video_outputpath = (
+            assets_path / f"{self.output_subdir}/{self.output_filename}"
+        )
+        final_video_outputpath.parent.mkdir(parents=True, exist_ok=True)
+        final_video_clip.write_videofile(
+            final_video_outputpath,
+            codec=self.codec,
+            fps=self.fps,
+        )
 
-            yield text2event(
-                self.name, f"Exporting final video to {final_video_filepath}..."
-            )
-            final_video_clip.write_videofile(
-                str(final_video_filepath),
-                codec="libx264",
-                fps=self.fps,
-                audio_codec="aac",
-            )
-
-            final_message = (
-                f"Video successfully assembled and saved to '{final_video_filepath}'."
-            )
-            yield text2event(self.name, final_message)
-
-        except Exception as e:
-            error_msg = f"An error occurred during video assembly: {e}"
-            logger.error(f"[{self.name}] {error_msg}", exc_info=True)
-            yield text2event(self.name, error_msg)
-        finally:
-            # Close clips to free resources
-            for clip_obj in (
-                [intro_clip, outro_clip, audio_clip, final_video_clip] + image_clips
-                if "image_clips" in locals()
-                else []
-            ):
-                if clip_obj and hasattr(clip_obj, "close") and callable(clip_obj.close):
-                    try:
-                        clip_obj.close()
-                    except Exception as e_close:
-                        logger.error(f"[{self.name}] Error closing clip: {e_close}")
+        ctx.session.state[self.output_key] = final_video_outputpath
+        completion_msg = (
+            f"Video assembly finished. Video stored at: '{final_video_outputpath}'"
+        )
+        logger.info(f"[{self.name}] {completion_msg}")
+        yield text2event(self.name, completion_msg)
 
 
 video_assembler_agent = VideoAssemblerAgent(
     name="VideoAssemblerAgent",
     description="Assembles video clips, images, and audio into a final video.",
-    voiceover_file_input_key="voiceover_path",
-    images_dir_input_key="images_path",
-    videos_dir_input_key="videos_path",
+    voiceover_subdir="voiceovers",
+    images_subdir="images",
+    videos_subdir="videos",
+    output_key="assembled_video_path",
     output_subdir="assembled_video",
     output_filename="short_video.mp4",
 )

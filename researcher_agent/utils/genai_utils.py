@@ -14,20 +14,6 @@ def get_client(api_key=None, http_options=None):
     return genai.Client(api_key=api_key, http_options=http_options)
 
 
-def get_generate_content_config(voice_name="Algenib"):
-    """Creates the content generation config for audio modality."""
-    return types.GenerateContentConfig(
-        response_modalities=["AUDIO"],
-        speech_config=types.SpeechConfig(
-            voice_config=types.VoiceConfig(
-                prebuilt_voice_config=types.PrebuiltVoiceConfig(
-                    voice_name=voice_name,
-                )
-            )
-        ),
-    )
-
-
 def text2event(author: str, text_message: str) -> Event:
     """Creates an ADK Event with a simple text message."""
     return Event(
