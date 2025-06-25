@@ -95,7 +95,8 @@ class VideoAssemblerAgent(BaseAgent):
             image_clip = chosen_effect_func(image_clip)
         except Exception as e:
             logger.warning(
-                f"[{self.name}] Failed to apply effect '{effect_name}': {e}. Skipping effect."
+                f"[{self.name}] Failed to apply effect '{effect_name}': {e}. Skipping effect.",
+                exc_info=True,
             )
             # Fallback to no effect if the chosen one fails
             pass
@@ -141,16 +142,17 @@ class VideoAssemblerAgent(BaseAgent):
             # Prioritize using videos if available
             remaining_duration = audio_clip.duration
             logger.info(f"[{self.name}] \t Voiceover duration {audio_clip.duration}")
-            if scene_videos:
-                for video_clip in video_clips:
-                    remaining_duration -= video_clip.duration
+            if video_clips:
+                remaining_duration -= sum(
+                    video_clip.duration for video_clip in video_clips
+                )
             else:
                 logger.info(
                     f"[{self.name}] \t No videos available for scene '{scene_idx + 1}'"
                 )
 
-            if scene_images and remaining_duration > 0:
-                image_duration_per_clip = remaining_duration / len(scene_images)
+            if image_clips and remaining_duration > 0:
+                image_duration_per_clip = remaining_duration / len(image_clips)
                 logger.info(
                     f"[{self.name}] \t image_duration_per_clip {image_duration_per_clip}"
                 )
@@ -159,12 +161,11 @@ class VideoAssemblerAgent(BaseAgent):
                     image_clip.with_duration(image_duration_per_clip)
                     for image_clip in image_clips
                 ]
-                processed_image_clips = []
-                for img_clip in image_clips:
-                    processed_image_clips.append(
-                        self._apply_random_effect_to_img(img_clip)
-                    )
-                image_clips = processed_image_clips
+                # Add random effect to image clips
+                image_clips = [
+                    self._apply_random_effect_to_img(img_clip)
+                    for img_clip in image_clips
+                ]
             else:
                 # TODO: If there are not images and we still need audio to fill,
                 # we need to extend the duration of the available videos
