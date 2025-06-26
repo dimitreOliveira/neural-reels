@@ -8,12 +8,18 @@ from google.adk.agents.invocation_context import InvocationContext
 from google.adk.events import Event
 from typing_extensions import override
 
+from researcher_agent.agents.expert_researcher import (
+    expert_researcher_agent,
+)
 from researcher_agent.agents.image_generator import (
     ImagenAgent,
     image_generator_agent,
 )
 from researcher_agent.agents.image_prompt_generator import (
     image_prompt_generator_agent,
+)
+from researcher_agent.agents.research_compiler import (
+    research_compiler_agent,
 )
 from researcher_agent.agents.scene_breakdown import (
     scene_breakdown_agent,
@@ -38,13 +44,15 @@ from researcher_agent.agents.voiceover_generator import (
     VoiceoverGeneratorAgent,
     voiceover_generator_agent,
 )
+from researcher_agent.agents.web_researcher import (
+    web_researcher_agent,
+)
 from researcher_agent.utils.genai_utils import text2event
 
 
 class WorkflowStage(Enum):
     THEME_DEFINITION = 1
     SCRIPT_REFINEMENT = 2
-    VIDEO_CREATION = 3
 
 
 load_dotenv()
@@ -57,9 +65,12 @@ class VideoCreatorWorkflowAgent(BaseAgent):
     Orchestrates the video creation workflow, including user approval steps.
     """
 
-    script_writer: Agent
-    user_feedback: Agent
     theme_definer: Agent
+    user_feedback: Agent
+    expert_researcher: Agent
+    web_researcher: Agent
+    research_compiler: Agent
+    script_writer: Agent
     scene_breakdown: Agent
     image_prompt_generator: Agent
     video_prompt_generator: Agent
@@ -76,9 +87,12 @@ class VideoCreatorWorkflowAgent(BaseAgent):
     def __init__(
         self,
         name: str,
-        script_writer: Agent,
-        user_feedback: Agent,
         theme_definer: Agent,
+        user_feedback: Agent,
+        expert_researcher: Agent,
+        web_researcher: Agent,
+        research_compiler: Agent,
+        script_writer: Agent,
         scene_breakdown: Agent,
         image_prompt_generator: Agent,
         video_prompt_generator: Agent,
@@ -88,9 +102,12 @@ class VideoCreatorWorkflowAgent(BaseAgent):
         video_assembler: VideoAssemblerAgent,
     ):
         sub_agents_list = [
-            script_writer,
-            user_feedback,
             theme_definer,
+            user_feedback,
+            expert_researcher,
+            web_researcher,
+            research_compiler,
+            script_writer,
             scene_breakdown,
             image_prompt_generator,
             video_prompt_generator,
@@ -102,9 +119,12 @@ class VideoCreatorWorkflowAgent(BaseAgent):
 
         super().__init__(
             name=name,
-            script_writer=script_writer,
-            user_feedback=user_feedback,
             theme_definer=theme_definer,
+            user_feedback=user_feedback,
+            expert_researcher=expert_researcher,
+            web_researcher=web_researcher,
+            research_compiler=research_compiler,
+            script_writer=script_writer,
             scene_breakdown=scene_breakdown,
             image_prompt_generator=image_prompt_generator,
             video_prompt_generator=video_prompt_generator,
@@ -143,12 +163,10 @@ class VideoCreatorWorkflowAgent(BaseAgent):
             yield event
 
         # 2. Ask for user feedback
-        theme = ctx.session.state[self.theme_definer.output_key].get(
-            self.theme_definer.output_key
-        )
+        theme = ctx.session.state[self.theme_definer.output_key]["theme"]
         yield text2event(
             self.name,
-            f"It seems that you want to create a short video content about '{theme}' is this correct?\nAnswer with 'yes' or describe what theme you want.",
+            f"It seems that you want to create a short video content about '{theme}' is this correct?\n\nAnswer with 'yes' or describe what theme you want.",
         )
 
         self.theme_approved = True
@@ -162,7 +180,7 @@ class VideoCreatorWorkflowAgent(BaseAgent):
 
         ctx.session.state["current_script"] = ctx.session.state.get(
             self.script_writer.output_key
-        ).get(self.script_writer.output_key)
+        )
 
         # 2. Ask for user feedback
         yield text2event(
@@ -174,12 +192,14 @@ class VideoCreatorWorkflowAgent(BaseAgent):
     async def _setup_assets_folder(
         self, ctx: InvocationContext
     ) -> AsyncGenerator[Event, None]:
-        theme_output = ctx.session.state[self.theme_definer.output_key]
-        theme = (
-            theme_output[self.theme_definer.output_key] if theme_output else "default"
-        )
+        theme_intent = ctx.session.state[self.theme_definer.output_key]
 
+        theme = theme_intent["theme"]
         assets_path = f"projects/{theme}".lower().replace(" ", "_")
+
+        # Update session state
+        ctx.session.state["theme"] = theme
+        ctx.session.state["intent"] = theme_intent["user_intent"]
         # set the theme as the output folder
         ctx.session.state["assets_path"] = assets_path
 
@@ -227,12 +247,37 @@ class VideoCreatorWorkflowAgent(BaseAgent):
                     async for event in self._setup_assets_folder(ctx):
                         yield event
 
-                    # 2. Script creation feedback loop
+                    # 2. Theme research
+                    yield text2event(self.name, "Starting research")
+
+                    # 2.1. Expert research
+                    yield text2event(self.name, "Prompting expert researcher...")
+                    async for event in self._run_sub_agent(self.expert_researcher, ctx):
+                        yield event
+
+                    # 2.2. Web researcher
+                    yield text2event(self.name, "Running web research...")
+                    async for event in self._run_sub_agent(self.web_researcher, ctx):
+                        yield event
+
+                    # 2.3. Research compiler
+                    yield text2event(self.name, "Compiling researched content...")
+                    async for event in self._run_sub_agent(self.research_compiler, ctx):
+                        yield event
+
+                    # 3. Script creation feedback loop
+                    yield text2event(
+                        self.name, "Research finished, starting script creation"
+                    )
                     async for event in self._draft_script_and_ask_for_feedback(ctx):
                         yield event
                     return
         elif self.workflow_stage == WorkflowStage.SCRIPT_REFINEMENT:
-            # 2.1. Process user's feedback
+            # This needs to be reset
+            async for event in self._setup_assets_folder(ctx):
+                yield event
+
+            # 3.1. Process user's feedback
             async for event in self._run_sub_agent(self.user_feedback, ctx):
                 yield event
 
@@ -242,63 +287,75 @@ class VideoCreatorWorkflowAgent(BaseAgent):
 
             # Script not approved
             if user_input.lower() != "approved":
-                # 2.2. If not approved keep iterating
+                # 3.2. If not approved keep iterating
                 self.script_approved = False
                 async for event in self._draft_script_and_ask_for_feedback(ctx):
                     yield event
                 return
             # Script approved
             else:
-                self.workflow_stage = WorkflowStage.VIDEO_CREATION
                 yield text2event(
                     self.name, "Script approved, starting the video generation process."
                 )
-        elif self.workflow_stage == WorkflowStage.VIDEO_CREATION:
-            # 5. Scene breakdown
-            async for event in self._run_sub_agent(self.scene_breakdown, ctx):
-                yield event
+                # 4. Scene breakdown
+                yield text2event(self.name, "Breaking script into scenes...")
+                async for event in self._run_sub_agent(self.scene_breakdown, ctx):
+                    yield event
 
-            # 6. Image prompts generation
-            async for event in self._run_sub_agent(self.image_prompt_generator, ctx):
-                yield event
+                # 5. Image prompts generation
+                yield text2event(self.name, "Generating prompts for the images...")
+                async for event in self._run_sub_agent(
+                    self.image_prompt_generator, ctx
+                ):
+                    yield event
 
-            # 7. Video prompts generation
-            async for event in self._run_sub_agent(self.video_prompt_generator, ctx):
-                yield event
+                # 6. Video prompts generation
+                yield text2event(self.name, "Generating prompts for the videos...")
+                async for event in self._run_sub_agent(
+                    self.video_prompt_generator, ctx
+                ):
+                    yield event
 
-            # 8. Voiceover generation
-            async for event in self._run_sub_agent(self.voiceover_generator, ctx):
-                yield event
+                # 7. Voiceover generation
+                yield text2event(self.name, "Generating voiceovers...")
+                async for event in self._run_sub_agent(self.voiceover_generator, ctx):
+                    yield event
 
-            # 9. Image generation
-            async for event in self._run_sub_agent(self.image_generator, ctx):
-                yield event
+                # 8. Image generation
+                yield text2event(self.name, "Generating images...")
+                async for event in self._run_sub_agent(self.image_generator, ctx):
+                    yield event
 
-            # 10. Video generation
-            async for event in self._run_sub_agent(self.video_generator, ctx):
-                yield event
+                # 9. Video generation
+                yield text2event(self.name, "Generating videos...")
+                async for event in self._run_sub_agent(self.video_generator, ctx):
+                    yield event
 
-            # 11. Video assembling
-            async for event in self._run_sub_agent(self.video_assembler, ctx):
-                yield event
+                # 10. Video assembling
+                yield text2event(self.name, "Assembling final video...")
+                async for event in self._run_sub_agent(self.video_assembler, ctx):
+                    yield event
 
-            yield text2event(
-                self.name,
-                f"Short video content creation workflow finished. Video stored at: '{ctx.session.state['assets_path']}'.",
-            )
+                yield text2event(
+                    self.name,
+                    f"Short video content creation workflow finished. Video stored at: '{ctx.session.state['assets_path']}'.",
+                )
 
-            logger.info(
-                f"\n\n[{self.name}] Finishing short content video creation workflow.\n\n"
-            )
+                logger.info(
+                    f"\n\n[{self.name}] Finishing short content video creation workflow.\n\n"
+                )
 
         return
 
 
 video_creator_workflow_agent = VideoCreatorWorkflowAgent(
     name="VideoCreatorWorkflowAgent",
-    script_writer=script_writer_agent,
-    user_feedback=user_feedback_agent,
     theme_definer=theme_definer_agent,
+    user_feedback=user_feedback_agent,
+    expert_researcher=expert_researcher_agent,
+    web_researcher=web_researcher_agent,
+    research_compiler=research_compiler_agent,
+    script_writer=script_writer_agent,
     scene_breakdown=scene_breakdown_agent,
     image_prompt_generator=image_prompt_generator_agent,
     video_prompt_generator=video_prompt_generator_agent,
