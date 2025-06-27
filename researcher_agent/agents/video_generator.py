@@ -159,7 +159,7 @@ class VeoAgent(BaseAgent):
 
         # Setup
         assets_path = Path(ctx.session.state.get("assets_path"))
-        prompts = ctx.session.state.get(self.input_key).get(self.input_key)
+        prompts = ctx.session.state.get(self.input_key).get(self.input_key)[:1]  # TEMP
 
         if not prompts:
             error_msg = (

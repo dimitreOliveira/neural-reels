@@ -37,8 +37,8 @@ scene_breakdown_agent = Agent(
     description="Breaks down a video script into a sequence of scenes.",
     instruction=SCENE_BREAKDOWN_PROMPT,
     model=MODEL_ID,
-    include_contents="none",
     output_key="scenes",
     output_schema=SceneBreakdownAgentOutput,
     after_agent_callback=save_agent_output,
+    include_contents="none",
 )
