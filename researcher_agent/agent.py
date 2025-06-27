@@ -25,6 +25,9 @@ from researcher_agent.agents.scene_breakdown import (
     scene_breakdown_agent,
 )
 from researcher_agent.agents.script_writer import script_writer_agent
+from researcher_agent.agents.seo_optimizer import (
+    seo_optimizer_agent,
+)
 from researcher_agent.agents.theme_definer import theme_definer_agent
 from researcher_agent.agents.user_feedback import (
     user_feedback_agent,
@@ -78,8 +81,8 @@ class VideoCreatorWorkflowAgent(BaseAgent):
     image_generator: ImagenAgent
     video_generator: VeoAgent
     video_assembler: VideoAssemblerAgent
-    # workflow_stage: WorkflowStage = WorkflowStage.THEME_DEFINITION
-    workflow_stage: WorkflowStage = WorkflowStage.SCRIPT_REFINEMENT
+    seo_optimizer: Agent
+    workflow_stage: WorkflowStage = WorkflowStage.THEME_DEFINITION
     theme_approved: bool = False
     script_approved: bool = False
 
@@ -101,6 +104,7 @@ class VideoCreatorWorkflowAgent(BaseAgent):
         image_generator: ImagenAgent,
         video_generator: VeoAgent,
         video_assembler: VideoAssemblerAgent,
+        seo_optimizer: Agent,
     ):
         sub_agents_list = [
             theme_definer,
@@ -116,6 +120,7 @@ class VideoCreatorWorkflowAgent(BaseAgent):
             image_generator,
             video_generator,
             video_assembler,
+            seo_optimizer,
         ]
 
         super().__init__(
@@ -133,6 +138,7 @@ class VideoCreatorWorkflowAgent(BaseAgent):
             image_generator=image_generator,
             video_generator=video_generator,
             video_assembler=video_assembler,
+            seo_optimizer=seo_optimizer,
             sub_agents=sub_agents_list,
         )
 
@@ -337,6 +343,13 @@ class VideoCreatorWorkflowAgent(BaseAgent):
                 async for event in self._run_sub_agent(self.video_assembler, ctx):
                     yield event
 
+                # 11. SEO Optimization
+                yield text2event(
+                    self.name, "Optimizing video title and description for SEO..."
+                )
+                async for event in self._run_sub_agent(self.seo_optimizer, ctx):
+                    yield event
+
                 yield text2event(
                     self.name,
                     f"Short video content creation workflow finished. Video stored at: '{ctx.session.state['assets_path']}'.",
@@ -364,6 +377,7 @@ video_creator_workflow_agent = VideoCreatorWorkflowAgent(
     image_generator=image_generator_agent,
     video_generator=video_generator_agent,
     video_assembler=video_assembler_agent,
+    seo_optimizer=seo_optimizer_agent,
 )
 
 root_agent = video_creator_workflow_agent
