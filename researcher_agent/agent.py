@@ -78,7 +78,8 @@ class VideoCreatorWorkflowAgent(BaseAgent):
     image_generator: ImagenAgent
     video_generator: VeoAgent
     video_assembler: VideoAssemblerAgent
-    workflow_stage: WorkflowStage = WorkflowStage.THEME_DEFINITION
+    # workflow_stage: WorkflowStage = WorkflowStage.THEME_DEFINITION
+    workflow_stage: WorkflowStage = WorkflowStage.SCRIPT_REFINEMENT
     theme_approved: bool = False
     script_approved: bool = False
 

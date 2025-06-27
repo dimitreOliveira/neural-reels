@@ -15,15 +15,15 @@ Here is the user's intent regarding the script: "{intent}".
 You should base the script on the information below gathered and compiled by the researchers:
 # Researched information
 
-{compiled_research_report?}
+{compiled_research_report}
 
-You may need to iterate over this script, below you can find the current version, if it exsits:
+You may need to iterate over this script, below you can find the current version, if it exists:
 # Current script
 
 {current_script?}
 
-Here you can see the user's feedback, if it exsits, that must be incorporated for the next iteration:
-# User's feedbacl
+Here you can see the user's feedback, if it exists, that must be incorporated for the next iteration:
+# User's feedback
 
 {user_input?}
 """

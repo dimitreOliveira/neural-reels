@@ -28,9 +28,9 @@ You should also understand the user's intent regarding how the short video conte
 - Theme: Python programming
 - User intent: Create a video related to the Python programming language, informative that should help students learning the language. The video should be short and have no more than 30 seconds.
 
-- User input: We should create a video about The Matrix movie, its impact on pop culture and the inovations.
+- User input: We should create a video about The Matrix movie, its impact on pop culture and the innovations.
 - Theme: Matrix movie
-- User intent: Create a video about the movie Matrix, the content should focus on its impact on pop culture and the inovations that the movie brought during that time. 
+- User intent: Create a video about the movie Matrix, the content should focus on its impact on pop culture and the innovations that the movie brought during that time.
 """
 
 
