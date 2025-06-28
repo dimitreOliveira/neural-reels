@@ -15,7 +15,7 @@ Your task is to synthesize the information from the expert researcher and the we
 This brief should highlight key facts, interesting points, curiosities, and potential narrative angles that would be engaging for a short video, while respecting the user's original intent.
 
 **Key Steps:**
-1.  **Analyze Inputs:** Carefully read and understand the user's intent, the expert researcher report, and the `web researcher report}.
+1.  **Analyze Inputs:** Carefully read and understand the user's intent, the expert researcher report, and the web researcher report.
 2.  **Identify Key Information:** Extract the most compelling and video-friendly information from both reports. Focus on key facts, interesting trivia, surprising statistics, and strong narrative hooks.
 3.  **Synthesize and Structure:** Combine the extracted points into a single, coherent research brief. Organize the information logically to suggest a potential narrative flow for a short video.
 4.  **Ensure Relevance:** Make sure the final brief is tightly aligned with the user's intent.

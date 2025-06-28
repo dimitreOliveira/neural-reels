@@ -45,17 +45,6 @@ This video explains the basics of quantum physics, including wave-particle duali
 }}
 ```
 
-## Video Script:
-Learn how to bake the perfect sourdough bread at home. This tutorial covers starter maintenance, mixing, kneading, proofing, and baking techniques for a crusty loaf.
-
-## Output:
-```json
-{{
-  "video_title": "Bake Perfect Sourdough Bread at Home: Beginner's Guide",
-  "video_description": "Master the art of sourdough bread baking with this comprehensive home tutorial! Learn everything from sourdough starter maintenance to mixing, kneading, proofing, and baking techniques. Achieve that perfect crusty loaf every time. Ideal for home bakers and beginners. #SourdoughBread #BakingTutorial #HomemadeBread #SourdoughStarter #BreadBaking #HomeBaking"
-}}
-```
-
 ## Example 2
 ### Video Script:
 Learn how to bake the perfect sourdough bread at home. This tutorial covers starter maintenance, mixing, kneading, proofing, and baking techniques for a crusty loaf.
