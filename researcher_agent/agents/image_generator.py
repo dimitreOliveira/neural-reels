@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-MODEL_ID = "models/imagen-3.0-generate-002"
+MODEL_ID = "models/imagen-4.0-ultra-generate-preview-06-06"
 ASPECT_RATIO = "9:16"
 
 
