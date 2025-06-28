@@ -257,20 +257,20 @@ class VideoCreatorWorkflowAgent(BaseAgent):
                     # 2. Theme research
                     yield text2event(self.name, "Starting research")
 
-                    # # 2.1. Expert research
-                    # yield text2event(self.name, "Prompting expert researcher...")
-                    # async for event in self._run_sub_agent(self.expert_researcher, ctx):
-                    #     yield event
+                    # 2.1. Expert research
+                    yield text2event(self.name, "Prompting expert researcher...")
+                    async for event in self._run_sub_agent(self.expert_researcher, ctx):
+                        yield event
 
-                    # # 2.2. Web researcher
-                    # yield text2event(self.name, "Running web research...")
-                    # async for event in self._run_sub_agent(self.web_researcher, ctx):
-                    #     yield event
+                    # 2.2. Web researcher
+                    yield text2event(self.name, "Running web research...")
+                    async for event in self._run_sub_agent(self.web_researcher, ctx):
+                        yield event
 
-                    # # 2.3. Research compiler
-                    # yield text2event(self.name, "Compiling researched content...")
-                    # async for event in self._run_sub_agent(self.research_compiler, ctx):
-                    #     yield event
+                    # 2.3. Research compiler
+                    yield text2event(self.name, "Compiling researched content...")
+                    async for event in self._run_sub_agent(self.research_compiler, ctx):
+                        yield event
 
                     # 3. Script creation feedback loop
                     yield text2event(
@@ -323,25 +323,25 @@ class VideoCreatorWorkflowAgent(BaseAgent):
                 ):
                     yield event
 
-                # # 7. Voiceover generation
-                # yield text2event(self.name, "Generating voiceovers...")
-                # async for event in self._run_sub_agent(self.voiceover_generator, ctx):
-                #     yield event
+                # 7. Voiceover generation
+                yield text2event(self.name, "Generating voiceovers...")
+                async for event in self._run_sub_agent(self.voiceover_generator, ctx):
+                    yield event
 
-                # # 8. Image generation
-                # yield text2event(self.name, "Generating images...")
-                # async for event in self._run_sub_agent(self.image_generator, ctx):
-                #     yield event
+                # 8. Image generation
+                yield text2event(self.name, "Generating images...")
+                async for event in self._run_sub_agent(self.image_generator, ctx):
+                    yield event
 
-                # # 9. Video generation
-                # yield text2event(self.name, "Generating videos...")
-                # async for event in self._run_sub_agent(self.video_generator, ctx):
-                #     yield event
+                # 9. Video generation
+                yield text2event(self.name, "Generating videos...")
+                async for event in self._run_sub_agent(self.video_generator, ctx):
+                    yield event
 
-                # # 10. Video assembling
-                # yield text2event(self.name, "Assembling final video...")
-                # async for event in self._run_sub_agent(self.video_assembler, ctx):
-                #     yield event
+                # 10. Video assembling
+                yield text2event(self.name, "Assembling final video...")
+                async for event in self._run_sub_agent(self.video_assembler, ctx):
+                    yield event
 
                 # 11. SEO Optimization
                 yield text2event(

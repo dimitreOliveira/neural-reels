@@ -1,8 +1,8 @@
 app:
-	adk web
+	uv run adk web
 
 app_cli:
-	adk run app
+	uv run adk run app
 
 backend:
 	uv run adk api_server --allow_origins="*"
@@ -12,7 +12,7 @@ install:
 
 lint:
 	uv run codespell
-	uv run ruff check --select I --fix
-	uv run ruff check
-	uv run ruff format
-	uv run mypy
+	uv run ruff check . --select I --fix
+	uv run ruff check .
+	uv run ruff format .
+	uv run mypy .

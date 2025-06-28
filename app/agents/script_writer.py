@@ -33,7 +33,7 @@ If a previous version of the script and user feedback are provided, you must inc
 `{intent}`
 
 ## Researched Information
-`{compiled_research_report?}`
+`{compiled_research_report}`
 
 ## Current Script (if any)
 `{current_script?}`
