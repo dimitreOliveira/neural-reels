@@ -9,8 +9,8 @@ from google.adk.events import Event
 from pydantic import Field
 from typing_extensions import override
 
-from researcher_agent.utils.genai_utils import get_client, text2event
-from researcher_agent.utils.image_utils import save_image_from_bytes
+from app.utils.genai_utils import get_client, text2event
+from app.utils.image_utils import save_image_from_bytes
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

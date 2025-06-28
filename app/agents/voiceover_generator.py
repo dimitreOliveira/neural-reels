@@ -10,8 +10,8 @@ from google.genai import types
 from pydantic import Field
 from typing_extensions import override
 
-from researcher_agent.utils.audio_utils import save_wave_file
-from researcher_agent.utils.genai_utils import (
+from app.utils.audio_utils import save_wave_file
+from app.utils.genai_utils import (
     get_client,
     text2event,
 )

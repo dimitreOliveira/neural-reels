@@ -19,7 +19,7 @@ from moviepy.video.fx import TimeMirror
 from pydantic import Field
 from typing_extensions import override
 
-from researcher_agent.utils.genai_utils import text2event
+from app.utils.genai_utils import text2event
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
