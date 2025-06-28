@@ -1,6 +1,6 @@
 from google.adk.agents import Agent
 
-from researcher_agent.callbacks.callbacks import save_agent_output
+from app.callbacks.callbacks import save_agent_output
 
 MODEL_ID = "gemini-2.5-pro"
 

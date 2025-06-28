@@ -8,49 +8,49 @@ from google.adk.agents.invocation_context import InvocationContext
 from google.adk.events import Event
 from typing_extensions import override
 
-from researcher_agent.agents.expert_researcher import (
+from app.agents.expert_researcher import (
     expert_researcher_agent,
 )
-from researcher_agent.agents.image_generator import (
+from app.agents.image_generator import (
     ImagenAgent,
     image_generator_agent,
 )
-from researcher_agent.agents.image_prompt_generator import (
+from app.agents.image_prompt_generator import (
     image_prompt_generator_agent,
 )
-from researcher_agent.agents.research_compiler import (
+from app.agents.research_compiler import (
     research_compiler_agent,
 )
-from researcher_agent.agents.scene_breakdown import (
+from app.agents.scene_breakdown import (
     scene_breakdown_agent,
 )
-from researcher_agent.agents.script_writer import script_writer_agent
-from researcher_agent.agents.seo_optimizer import (
+from app.agents.script_writer import script_writer_agent
+from app.agents.seo_optimizer import (
     seo_optimizer_agent,
 )
-from researcher_agent.agents.theme_definer import theme_definer_agent
-from researcher_agent.agents.user_feedback import (
+from app.agents.theme_definer import theme_definer_agent
+from app.agents.user_feedback import (
     user_feedback_agent,
 )
-from researcher_agent.agents.video_assembler import (
+from app.agents.video_assembler import (
     VideoAssemblerAgent,
     video_assembler_agent,
 )
-from researcher_agent.agents.video_generator import (
+from app.agents.video_generator import (
     VeoAgent,
     video_generator_agent,
 )
-from researcher_agent.agents.video_prompt_generator import (
+from app.agents.video_prompt_generator import (
     video_prompt_generator_agent,
 )
-from researcher_agent.agents.voiceover_generator import (
+from app.agents.voiceover_generator import (
     VoiceoverGeneratorAgent,
     voiceover_generator_agent,
 )
-from researcher_agent.agents.web_researcher import (
+from app.agents.web_researcher import (
     web_researcher_agent,
 )
-from researcher_agent.utils.genai_utils import text2event
+from app.utils.genai_utils import text2event
 
 
 class WorkflowStage(Enum):
@@ -257,20 +257,20 @@ class VideoCreatorWorkflowAgent(BaseAgent):
                     # 2. Theme research
                     yield text2event(self.name, "Starting research")
 
-                    # 2.1. Expert research
-                    yield text2event(self.name, "Prompting expert researcher...")
-                    async for event in self._run_sub_agent(self.expert_researcher, ctx):
-                        yield event
+                    # # 2.1. Expert research
+                    # yield text2event(self.name, "Prompting expert researcher...")
+                    # async for event in self._run_sub_agent(self.expert_researcher, ctx):
+                    #     yield event
 
-                    # 2.2. Web researcher
-                    yield text2event(self.name, "Running web research...")
-                    async for event in self._run_sub_agent(self.web_researcher, ctx):
-                        yield event
+                    # # 2.2. Web researcher
+                    # yield text2event(self.name, "Running web research...")
+                    # async for event in self._run_sub_agent(self.web_researcher, ctx):
+                    #     yield event
 
-                    # 2.3. Research compiler
-                    yield text2event(self.name, "Compiling researched content...")
-                    async for event in self._run_sub_agent(self.research_compiler, ctx):
-                        yield event
+                    # # 2.3. Research compiler
+                    # yield text2event(self.name, "Compiling researched content...")
+                    # async for event in self._run_sub_agent(self.research_compiler, ctx):
+                    #     yield event
 
                     # 3. Script creation feedback loop
                     yield text2event(
@@ -323,25 +323,25 @@ class VideoCreatorWorkflowAgent(BaseAgent):
                 ):
                     yield event
 
-                # 7. Voiceover generation
-                yield text2event(self.name, "Generating voiceovers...")
-                async for event in self._run_sub_agent(self.voiceover_generator, ctx):
-                    yield event
+                # # 7. Voiceover generation
+                # yield text2event(self.name, "Generating voiceovers...")
+                # async for event in self._run_sub_agent(self.voiceover_generator, ctx):
+                #     yield event
 
-                # 8. Image generation
-                yield text2event(self.name, "Generating images...")
-                async for event in self._run_sub_agent(self.image_generator, ctx):
-                    yield event
+                # # 8. Image generation
+                # yield text2event(self.name, "Generating images...")
+                # async for event in self._run_sub_agent(self.image_generator, ctx):
+                #     yield event
 
-                # 9. Video generation
-                yield text2event(self.name, "Generating videos...")
-                async for event in self._run_sub_agent(self.video_generator, ctx):
-                    yield event
+                # # 9. Video generation
+                # yield text2event(self.name, "Generating videos...")
+                # async for event in self._run_sub_agent(self.video_generator, ctx):
+                #     yield event
 
-                # 10. Video assembling
-                yield text2event(self.name, "Assembling final video...")
-                async for event in self._run_sub_agent(self.video_assembler, ctx):
-                    yield event
+                # # 10. Video assembling
+                # yield text2event(self.name, "Assembling final video...")
+                # async for event in self._run_sub_agent(self.video_assembler, ctx):
+                #     yield event
 
                 # 11. SEO Optimization
                 yield text2event(

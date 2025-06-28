@@ -11,7 +11,7 @@ from google.genai import types
 from pydantic import Field
 from typing_extensions import override
 
-from researcher_agent.utils.genai_utils import get_client, text2event
+from app.utils.genai_utils import get_client, text2event
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -118,7 +118,7 @@ class VeoAgent(BaseAgent):
         )
 
         while not operation.done:
-            status_msg = f"Video for scene '{scene_idx + 1}' generation in progess. Will check again in {self.polling_interval_seconds}s."
+            status_msg = f"Video for scene '{scene_idx + 1}' generation in progress. Will check again in {self.polling_interval_seconds}s."
             logger.info(f"[{self.name}] {status_msg}")
             yield text2event(self.name, status_msg)
             await asyncio.sleep(self.polling_interval_seconds)

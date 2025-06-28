@@ -1,6 +1,6 @@
 from google.adk.agents import Agent
 
-from researcher_agent.callbacks.callbacks import save_agent_output
+from app.callbacks.callbacks import save_agent_output
 
 MODEL_ID = "gemini-2.5-flash"
 SCRIPT_WRITER_PROMPT = """
@@ -33,7 +33,7 @@ If a previous version of the script and user feedback are provided, you must inc
 `{intent}`
 
 ## Researched Information
-`{compiled_research_report}`
+`{compiled_research_report?}`
 
 ## Current Script (if any)
 `{current_script?}`

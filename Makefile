@@ -2,12 +2,17 @@ app:
 	adk web
 
 app_cli:
-	adk run researcher_agent
+	adk run app
+
+backend:
+	uv run adk api_server --allow_origins="*"
+
+install:
+	uv sync --frozen
 
 lint:
-	ruff check --select I --fix
-	ruff check
-	ruff format
-
-# build:
-# 	uv pip install -r requirements.txt
+	uv run codespell
+	uv run ruff check --select I --fix
+	uv run ruff check
+	uv run ruff format
+	uv run mypy
