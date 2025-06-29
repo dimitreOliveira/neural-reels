@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 MODEL_ID = "veo-2.0-generate-001"
 ASPECT_RATIO = "9:16"
-DURATION_SECONDS = 5  # 8
+DURATION_SECONDS = 8
 POLLING_INTERVAL_SECONDS = 10
 API_VERSION = "v1beta"
 
