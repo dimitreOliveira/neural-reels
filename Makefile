@@ -11,7 +11,7 @@ dev-backend:
 	uv run adk api_server --allow_origins="*"
 
 dev-frontend:
-	uv run streamlit run frontend/app.py
+	uv run streamlit run frontend/neural_reels_app.py
 
 install:
 	uv sync --frozen

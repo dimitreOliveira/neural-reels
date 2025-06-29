@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import AsyncGenerator
+from typing import Any, AsyncGenerator
 
 from google import genai
 from google.adk.agents import BaseAgent
@@ -65,7 +65,12 @@ class VoiceoverGeneratorAgent(BaseAgent):
 
     model_config = {"arbitrary_types_allowed": True}
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any):
+        """Initializes the VoiceoverGeneratorAgent.
+
+        Args:
+            **kwargs: Keyword arguments to pass to the BaseAgent constructor.
+        """
         super().__init__(**kwargs)
         self.client = get_client()
         self.generate_content_config = types.GenerateContentConfig(
@@ -82,8 +87,20 @@ class VoiceoverGeneratorAgent(BaseAgent):
     async def _generate_audio(
         self, scene_idx: int, prompt: str, output_dir: Path
     ) -> AsyncGenerator[Event, None]:
-        """
-        Generates audio for a single prompt (scene) and saves it.
+        """Generates and saves an audio voiceover for a single scene.
+
+        This method calls the Gemini TTS API to generate an audio file from the
+        provided text prompt and saves it as a WAV file in the specified
+        output directory.
+
+        Args:
+            scene_idx: The index of the scene.
+            prompt: The text to be converted to speech.
+            output_dir: The directory where the generated audio file will be
+                saved.
+
+        Yields:
+            An event indicating the progress of audio generation.
         """
         logger.info(
             f"[{self.name}] Generating audio for scene {scene_idx + 1} with prompt: '{prompt[:70]}...'"
@@ -107,8 +124,18 @@ class VoiceoverGeneratorAgent(BaseAgent):
     async def _run_async_impl(
         self, ctx: InvocationContext
     ) -> AsyncGenerator[Event, None]:
-        """
-        The core implementation of the agent's logic.
+        """Generates voiceovers for all scene scripts in the session state.
+
+        This is the main entry point for the agent. It retrieves scene scripts
+        from the session state, creates the necessary output directories, and
+        iterates through the scripts, calling `_generate_audio` for each one.
+
+        Args:
+            ctx: The invocation context, containing session state with scene
+                 scripts and asset paths.
+
+        Yields:
+            Events indicating the overall progress of voiceover generation.
         """
         logger.info(f"[{self.name}] Starting voiceover generation for multiple scenes.")
 
