@@ -72,8 +72,17 @@ class VideoAssemblerAgent(BaseAgent):
     model_config = {"arbitrary_types_allowed": True}
 
     def _apply_random_effect_to_img(self, image_clip: ImageClip) -> CompositeVideoClip:
-        """
-        Applies a random visual effect to an ImageClip and finalizes its properties.
+        """Applies a random visual effect to an ImageClip.
+
+        This method selects a random zoom or pan effect from a predefined list
+        and applies it to the given image clip to create simple motion. It also
+        randomly decides whether to reverse the clip's playback.
+
+        Args:
+            image_clip: The MoviePy ImageClip to apply the effect to.
+
+        Returns:
+            A MoviePy CompositeVideoClip with the applied effect.
         """
         effects_with_names = [
             ("No effect", lambda clip: clip.resized(lambda t: 1)),
@@ -115,7 +124,22 @@ class VideoAssemblerAgent(BaseAgent):
     def _assemble_scene_clip(
         self, scene_idx: int, scene: str, assets_path: Path
     ) -> Optional[CompositeVideoClip]:
-        """Assembles a single scene's video clip from its assets."""
+        """Assembles a single video clip for a given scene.
+
+        This method gathers all assets (voiceover, images, videos) for a
+        specific scene, combines them into a single video clip using MoviePy,
+        and sets the voiceover as the audio. It prioritizes video assets and
+        uses image assets to fill the remaining duration of the voiceover.
+
+        Args:
+            scene_idx: The index of the scene being assembled.
+            scene: The path to the scene's asset directory.
+            assets_path: The root path for the project's assets.
+
+        Returns:
+            A MoviePy CompositeVideoClip for the scene, or None if no assets
+            were available to create a clip.
+        """
         scene_clip = None
         scene_voiceovers = list(Path(f"{scene}/{self.voiceover_subdir}").glob("*.wav"))
         scene_images = list(Path(f"{scene}/{self.images_subdir}").glob("*.jpg"))
@@ -204,6 +228,19 @@ class VideoAssemblerAgent(BaseAgent):
     async def _run_async_impl(
         self, ctx: InvocationContext
     ) -> AsyncGenerator[Event, None]:
+        """Assembles the final video from individual scene clips.
+
+        This is the main entry point for the agent. It finds all scene
+        directories, assembles a clip for each one using `_assemble_scene_clip`,
+        and then concatenates all scene clips into a final video. The path to
+        the final video is stored in the session state.
+
+        Args:
+            ctx: The invocation context, containing the path to the assets.
+
+        Yields:
+            Events indicating the progress of the video assembly.
+        """
         logger.info(f"[{self.name}] Starting video assembly.")
 
         # Setup

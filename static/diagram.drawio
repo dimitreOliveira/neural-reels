@@ -1,0 +1,318 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" version="26.2.14">
+  <diagram name="Page-1" id="uHVKRVzOjuZYH-UgRW6x">
+    <mxGraphModel dx="1635" dy="1509" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-104" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="230" y="140" width="440" height="1140" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-105" value="" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 8;" vertex="1" parent="1">
+          <mxGeometry x="250" y="160" width="110" height="520" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-5" value="All LLM agents&#xa;use Gemini&#xa;" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Google-gemini-icon.svg/2048px-Google-gemini-icon.svg.png;" vertex="1" parent="1">
+          <mxGeometry x="290" y="720" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-9" value="Frontend" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Streamlit-logo-primary-colormark-darktext.png/1280px-Streamlit-logo-primary-colormark-darktext.png;" vertex="1" parent="1">
+          <mxGeometry x="259.65" y="430" width="90.35" height="52.85" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-31" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-16" target="6fm2Nr6pFytVAdn31GYa-30">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-36" value="2. Suggest the&lt;br&gt;theme and intent" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-31">
+          <mxGeometry x="0.05" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-16" value="ThemeDefiner" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
+          <mxGeometry x="420" y="160" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-17" value="" style="endArrow=none;dashed=1;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="666" y="278" as="sourcePoint" />
+            <mxPoint x="246" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-18" value="&lt;b&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;Neural Reels&lt;/font&gt;&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="100" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-27" value="" style="endArrow=none;dashed=1;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="666" y="690" as="sourcePoint" />
+            <mxPoint x="246" y="690" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-28" target="6fm2Nr6pFytVAdn31GYa-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-35" value="1. Describe the&lt;br&gt;desired video" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-29">
+          <mxGeometry x="-0.3357" y="1" relative="1" as="geometry">
+            <mxPoint x="15" y="1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-28" value="&lt;span&gt;User&lt;/span&gt;" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#232F3D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.user;" vertex="1" parent="1">
+          <mxGeometry x="270" y="165" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-37" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="620" y="200" as="sourcePoint" />
+            <mxPoint x="290" y="200" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="619.96" y="250" />
+              <mxPoint x="289.96" y="250" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-38" value="3. Ask for user approval" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-37">
+          <mxGeometry x="-0.1579" relative="1" as="geometry">
+            <mxPoint x="-30" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-30" value="UserFeedback" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
+          <mxGeometry x="600" y="160" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-32" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;Theme definition&lt;/font&gt;&lt;/h1&gt;&lt;p&gt;User interacts with the agents to define the video theme.&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="670" y="150" width="180" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-33" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;Script refinement&lt;/font&gt;&lt;/h1&gt;&lt;p&gt;User works with the agents to refine the video script.&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="670" y="415" width="180" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-34" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;Video creation&lt;/font&gt;&lt;/h1&gt;&lt;p&gt;Mult-agent team collaborates to assemble the final video.&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="670" y="880" width="180" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-40" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="460" y="263" as="sourcePoint" />
+            <mxPoint x="460" y="333" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-41" value="&lt;b&gt;Theme approved&lt;/b&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-40">
+          <mxGeometry x="0.1333" y="-4" relative="1" as="geometry">
+            <mxPoint y="-9" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-42" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-44" target="6fm2Nr6pFytVAdn31GYa-50">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-43" value="6. Suggest the&lt;br&gt;script" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-42">
+          <mxGeometry x="0.05" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-44" value="ScriptWriter" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
+          <mxGeometry x="435" y="574" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-45" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-47" target="6fm2Nr6pFytVAdn31GYa-44">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-46" value="8. Approve the script&lt;br&gt;or provide feedback" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-45">
+          <mxGeometry x="-0.3357" y="1" relative="1" as="geometry">
+            <mxPoint x="15" y="1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-47" value="User" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#232F3D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.user;flipV=0;flipH=1;spacingBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="270" y="579" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-48" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-50" target="6fm2Nr6pFytVAdn31GYa-47">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="624" y="664" />
+              <mxPoint x="290" y="664" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-49" value="7. Ask for user approval" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-48">
+          <mxGeometry x="-0.1579" relative="1" as="geometry">
+            <mxPoint x="-5" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-50" value="UserFeedback" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
+          <mxGeometry x="604" y="574" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-55" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-51" target="6fm2Nr6pFytVAdn31GYa-53">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="410" y="415" />
+              <mxPoint x="450" y="415" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-57" value="4. Build&lt;br&gt;expert report" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-55">
+          <mxGeometry x="-0.3333" relative="1" as="geometry">
+            <mxPoint x="-15" y="10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-51" value="ExpertResearcher" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
+          <mxGeometry x="385" y="330" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-56" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.708;entryY=0.008;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-52" target="6fm2Nr6pFytVAdn31GYa-53">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="510" y="415" />
+              <mxPoint x="470" y="415" />
+              <mxPoint x="470" y="450" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-58" value="4. Build&lt;br&gt;web report" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-56">
+          <mxGeometry x="-0.4167" y="5" relative="1" as="geometry">
+            <mxPoint x="10" y="5" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-52" value="WebResearcher" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
+          <mxGeometry x="485" y="330" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-59" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-53" target="6fm2Nr6pFytVAdn31GYa-44">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-60" value="5. Compile research" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-59">
+          <mxGeometry x="0.1125" y="-1" relative="1" as="geometry">
+            <mxPoint x="21" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-53" value="ResearchCompiler" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
+          <mxGeometry x="435" y="450" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-61" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="460" y="680" as="sourcePoint" />
+            <mxPoint x="460" y="750" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-62" value="&lt;b&gt;Script approved&lt;/b&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-61">
+          <mxGeometry x="0.1333" y="-4" relative="1" as="geometry">
+            <mxPoint y="-9" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-65" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-63" target="6fm2Nr6pFytVAdn31GYa-64">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="450" y="867" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-84" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-63" target="6fm2Nr6pFytVAdn31GYa-66">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="470" y="867" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-103" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=1 4;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-63" target="6fm2Nr6pFytVAdn31GYa-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-63" value="SceneBreakdown" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
+          <mxGeometry x="435" y="751" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-70" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-64" target="6fm2Nr6pFytVAdn31GYa-69">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-85" value="9. Generate&lt;div&gt;image prompts&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-70">
+          <mxGeometry x="0.1436" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-64" value="ImagePromptGenerator" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
+          <mxGeometry x="350" y="842" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-72" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-66" target="6fm2Nr6pFytVAdn31GYa-71">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-86" value="9. Generate&lt;div&gt;video prompts&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-72">
+          <mxGeometry x="0.1436" y="-3" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-66" value="VideoPromptGenerator" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
+          <mxGeometry x="510" y="842" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-76" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-69" target="6fm2Nr6pFytVAdn31GYa-73">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-87" value="10. Generate&amp;nbsp;&lt;span style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212)); color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;images&lt;/span&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-76">
+          <mxGeometry x="-0.5235" relative="1" as="geometry">
+            <mxPoint x="-32" y="58" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-99" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=1 4;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-69" target="6fm2Nr6pFytVAdn31GYa-97">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-69" value="ImageGenerator" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
+          <mxGeometry x="350" y="970" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-77" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-71" target="6fm2Nr6pFytVAdn31GYa-73">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-88" value="10. Generate&amp;nbsp;&lt;span style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212)); color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;videos&lt;/span&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-77">
+          <mxGeometry x="0.0865" relative="1" as="geometry">
+            <mxPoint x="47" y="28" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-101" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;dashPattern=1 4;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-71" target="6fm2Nr6pFytVAdn31GYa-100">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-71" value="VideoGenerator" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
+          <mxGeometry x="510" y="970" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-79" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-73" target="6fm2Nr6pFytVAdn31GYa-78">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-89" value="11. Assemble&lt;div&gt;final video&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-79">
+          <mxGeometry x="0.04" y="1" relative="1" as="geometry">
+            <mxPoint x="-1" y="19" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-73" value="VideoAssembler" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
+          <mxGeometry x="435" y="1081" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-92" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="6fm2Nr6pFytVAdn31GYa-90">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="454.03999999999996" y="1213" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="470" y="1213" />
+              <mxPoint x="470" y="1199" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-93" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-78" target="6fm2Nr6pFytVAdn31GYa-91">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="470" y="1228" />
+              <mxPoint x="470" y="1246" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-78" value="SEOOptimizer" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
+          <mxGeometry x="335" y="1203" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-81" value="&lt;span style=&quot;font-size: 11px; text-wrap-mode: nowrap;&quot;&gt;8. Split the&lt;br&gt;script&amp;nbsp;&lt;/span&gt;&lt;div style=&quot;font-size: 11px; text-wrap-mode: nowrap;&quot;&gt;into scenes&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;labelBackgroundColor=default;" vertex="1" parent="1">
+          <mxGeometry x="425" y="833" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-90" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://www.iconpacks.net/icons/1/free-video-icon-836-thumb.png;" vertex="1" parent="1">
+          <mxGeometry x="495" y="1173" width="52" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-91" value="" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn2.iconfinder.com/data/icons/essential-web-5/50/script-programming-coding-add-on-128.png" vertex="1" parent="1">
+          <mxGeometry x="500" y="1225" width="42" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-96" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-78" target="6fm2Nr6pFytVAdn31GYa-95">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="385" y="1228" as="sourcePoint" />
+            <mxPoint x="450" y="1199" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="420" y="1228" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-95" value="&lt;span style=&quot;font-size: 11px; text-wrap-mode: nowrap;&quot;&gt;12. Generate&amp;nbsp;&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 11px; text-wrap-mode: nowrap;&quot;&gt;video and&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 11px; text-wrap-mode: nowrap;&quot;&gt;SEO assets&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;labelBackgroundColor=default;" vertex="1" parent="1">
+          <mxGeometry x="396" y="1213" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-97" value="Imagen" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://analisemacro.com.br/wp-content/uploads/2024/06/ai-studio-icon.png;" vertex="1" parent="1">
+          <mxGeometry x="240" y="971" width="49" height="49" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-100" value="Veo" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://analisemacro.com.br/wp-content/uploads/2024/06/ai-studio-icon.png;dashed=1;dashPattern=1 4;" vertex="1" parent="1">
+          <mxGeometry x="604" y="970" width="49" height="49" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

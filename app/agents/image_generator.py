@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import AsyncGenerator
+from typing import Any, AsyncGenerator
 
 from google import genai
 from google.adk.agents import BaseAgent
@@ -70,22 +70,37 @@ class ImagenAgent(BaseAgent):
 
     model_config = {"arbitrary_types_allowed": True}
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any):
+        """Initializes the ImagenAgent.
+
+        Args:
+            **kwargs: Keyword arguments to pass to the BaseAgent constructor.
+        """
         super().__init__(**kwargs)
         self.client = get_client()
-        self.image_gen_config = dict(
-            number_of_images=self.images_per_prompt,
-            output_mime_type=self.output_mime_type,
-            person_generation=self.person_generation,
-            aspect_ratio=self.aspect_ratio,
-        )
+        self.image_gen_config = {
+            "number_of_images": self.images_per_prompt,
+            "output_mime_type": self.output_mime_type,
+            "person_generation": self.person_generation,
+            "aspect_ratio": self.aspect_ratio,
+        }
 
     async def _generate_image(
         self, scene_idx: int, prompt: str, output_dir: Path
     ) -> AsyncGenerator[Event, None]:
-        """
-        Generates an image for a single scene/prompt, yields status events,
-        and saves the image.
+        """Generates and saves an image for a single scene.
+
+        This method calls the Imagen API to generate an image based on the
+        provided prompt. It saves the resulting image to the specified
+        output directory.
+
+        Args:
+            scene_idx: The index of the scene.
+            prompt: The text prompt for image generation.
+            output_dir: The directory where the generated image will be saved.
+
+        Yields:
+            Events indicating the progress of image generation.
         """
         logger.info(
             f"[{self.name}] Generating image for scene {scene_idx + 1} with prompt: '{prompt[:70]}...'"
@@ -115,8 +130,18 @@ class ImagenAgent(BaseAgent):
     async def _run_async_impl(
         self, ctx: InvocationContext
     ) -> AsyncGenerator[Event, None]:
-        """
-        The core implementation of the agent's logic.
+        """Generates images for all prompts in the session state.
+
+        This is the main entry point for the agent. It retrieves image prompts
+        from the session state, creates the necessary output directories, and
+        iterates through the prompts, calling `_generate_image` for each one.
+
+        Args:
+            ctx: The invocation context, containing session state with prompts
+                 and asset paths.
+
+        Yields:
+            Events indicating the overall progress of image generation.
         """
         logger.info(f"[{self.name}] Starting image generation.")
 

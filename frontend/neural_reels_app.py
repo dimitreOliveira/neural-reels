@@ -22,6 +22,7 @@ Usage:
 import logging
 import time
 import uuid
+from typing import Any, Dict, List, Optional
 
 import requests
 import streamlit as st
@@ -43,22 +44,35 @@ API_BASE_URL = "http://localhost:8000"
 APP_NAME = "app"  # Based on `adk run app` in Makefile.mk
 
 # --- Session State Initialization ---
+# Initialize session state keys to avoid errors on first run.
+# See: https://docs.streamlit.io/library/api-reference/session-state
 if "user_id" not in st.session_state:
-    st.session_state.user_id = f"user-{uuid.uuid4()}"
+    st.session_state.user_id: str = f"user-{uuid.uuid4()}"
 
 if "session_id" not in st.session_state:
-    st.session_state.session_id = None
+    st.session_state.session_id: Optional[str] = None
 
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state.messages: List[Dict[str, Any]] = []
 
 
-def create_session():
-    """Create a new session with the ADK agent."""
+def create_session() -> bool:
+    """Create a new session with the ADK agent.
+
+    Sends a POST request to the backend to establish a new session.
+    On success, it updates the Streamlit session state with the new
+    session ID and clears any existing messages.
+
+    Returns:
+        bool: True if the session was created successfully, False otherwise.
+    """
     session_id = f"session-{int(time.time())}"
     try:
         response = requests.post(
-            f"{API_BASE_URL}/apps/{APP_NAME}/users/{st.session_state.user_id}/sessions/{session_id}",
+            (
+                f"{API_BASE_URL}/apps/{APP_NAME}/users/"
+                f"{st.session_state.user_id}/sessions/{session_id}"
+            ),
             headers={"Content-Type": "application/json"},
             json={},
             timeout=10,
@@ -74,8 +88,16 @@ def create_session():
         return False
 
 
-def send_message(message: str):
-    """Send a message to the agent and handle the response."""
+def send_message(message: str) -> None:
+    """Send a message to the agent and handle the response.
+
+    This function appends the user's message to the chat history, sends it
+    to the backend API, and processes the events returned by the agent.
+    Assistant messages are extracted and displayed in the chat.
+
+    Args:
+        message: The user's input message.
+    """
     if not st.session_state.session_id:
         st.error("No active session. Please create a session first.")
         return
@@ -137,6 +159,7 @@ def send_message(message: str):
 # --- UI Rendering ---
 st.title("🎥 Neural Reels")
 st.caption("AI-Powered Short-Form Video Asset Generator")
+st.subheader("Start by describing the content that you want to generate.")
 
 with st.sidebar:
     st.header("Controls")
@@ -150,7 +173,7 @@ for msg in st.session_state.messages:
         st.write(msg["content"])
 
 if st.session_state.session_id:
-    if user_input := st.chat_input("Describe the video you want to create..."):
+    if user_input := st.chat_input("Provide your input here"):
         send_message(user_input)
         st.rerun()
 else:

@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from pathlib import Path
-from typing import AsyncGenerator
+from typing import Any, AsyncGenerator
 
 from google import genai
 from google.adk.agents import BaseAgent
@@ -83,7 +83,12 @@ class VeoAgent(BaseAgent):
 
     model_config = {"arbitrary_types_allowed": True}
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any):
+        """Initializes the VeoAgent.
+
+        Args:
+            **kwargs: Keyword arguments to pass to the BaseAgent constructor.
+        """
         super().__init__(**kwargs)
         self.client = get_client(http_options={"api_version": API_VERSION})
         self.video_gen_config = types.GenerateVideosConfig(
@@ -100,10 +105,20 @@ class VeoAgent(BaseAgent):
         scene_idx: int,
         prompt: str,
         output_dir: Path,
-    ) -> AsyncGenerator[Event, bool]:
-        """
-        Generates a video for a single scene/prompt, yields status events,
-        and returns True if successful, False otherwise.
+    ) -> AsyncGenerator[Event, None]:
+        """Generates and saves a video for a single scene.
+
+        This method calls the Veo API to generate a video based on the
+        provided prompt. It polls the operation status until the video is
+        ready, then downloads and saves it to the specified output directory.
+
+        Args:
+            scene_idx: The index of the scene.
+            prompt: The text prompt for video generation.
+            output_dir: The directory where the generated video will be saved.
+
+        Yields:
+            Events indicating the progress of video generation.
         """
         logger.info(
             f"[{self.name}] Generating video for scene {scene_idx + 1} with prompt: '{prompt[:70]}...'"
@@ -155,11 +170,24 @@ class VeoAgent(BaseAgent):
     async def _run_async_impl(
         self, ctx: InvocationContext
     ) -> AsyncGenerator[Event, None]:
+        """Generates videos for all prompts in the session state.
+
+        This is the main entry point for the agent. It retrieves video prompts
+        from the session state, creates the necessary output directories, and
+        iterates through the prompts, calling `_generate_video` for each one.
+
+        Args:
+            ctx: The invocation context, containing session state with prompts
+                 and asset paths.
+
+        Yields:
+            Events indicating the overall progress of video generation.
+        """
         logger.info(f"[{self.name}] Starting video generation.")
 
         # Setup
         assets_path = Path(ctx.session.state.get("assets_path"))
-        prompts = ctx.session.state.get(self.input_key).get(self.input_key)[:1]  # TEMP
+        prompts = ctx.session.state.get(self.input_key).get(self.input_key)
 
         if not prompts:
             error_msg = (
