@@ -8,13 +8,13 @@ process user requests and display the generated results.
 
 Requirements:
 ------------
-- The ADK backend server must be running (e.g., `make backend`).
+- The ADK backend server must be running (e.g., `make dev-backend`).
 - All project dependencies must be installed (`uv sync --frozen`).
 
 Usage:
 ------
-1. Start the backend server: `make backend`
-2. In a new terminal, run this app: `make frontend`
+1. Start the backend server: `make dev-backend`
+2. In a new terminal, run this app: `make dev-frontend`
 3. Open the provided URL in your browser to start creating!
 
 """
