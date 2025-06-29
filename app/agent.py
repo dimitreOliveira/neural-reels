@@ -304,6 +304,7 @@ class VideoCreatorWorkflowAgent(BaseAgent):
                 yield text2event(
                     self.name, "Script approved, starting the video generation process."
                 )
+
                 # 4. Scene breakdown
                 yield text2event(self.name, "Breaking script into scenes...")
                 async for event in self._run_sub_agent(self.scene_breakdown, ctx):
