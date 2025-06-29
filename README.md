@@ -11,7 +11,7 @@ This project uses the [Google Agent Development Kit (ADK)](https://google.github
 
 ## How It Works
 
-The application follows an interactive, multi-step workflow managed by the an orchestrator agent. This agent guides the user through the creative process, ensuring the final output aligns with their vision.
+The application follows an interactive, multi-step workflow managed by the orchestrator agent. This agent guides the user through the creative process, ensuring the final output aligns with their vision.
 
 1.  **User Prompt**: The process begins in a chat interface where the user describes the video they want to create (e.g., "a video about the Roman Empire").
 2.  **Theme Definition**: The `ThemeDefinerAgent` analyzes the prompt and proposes a specific video theme (e.g., "The Rise and Fall of the Roman Empire"). The user must approve this theme before the workflow continues.

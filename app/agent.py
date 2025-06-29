@@ -228,15 +228,15 @@ class VideoCreatorWorkflowAgent(BaseAgent):
     ) -> AsyncGenerator[Event, None]:
         """Drafts a video script and asks for user feedback.
 
-                This method runs the script writer agent to generate a draft of the
-                video script. It then asks the user for approval or feedback for
+        This method runs the script writer agent to generate a draft of the
+        video script. It then asks the user for approval or feedback for
         revisions.
 
-                Args:
-                    ctx: The current invocation context.
+        Args:
+            ctx: The current invocation context.
 
-                Yields:
-                    Events from the script writer agent and the feedback request.
+        Yields:
+            Events from the script writer agent and the feedback request.
         """
         # 1. Script creation feedback loop
         async for event in self._run_sub_agent(self.script_writer, ctx):
