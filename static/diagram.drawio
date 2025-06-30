@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" version="26.2.14">
   <diagram name="Page-1" id="uHVKRVzOjuZYH-UgRW6x">
-    <mxGraphModel dx="1635" dy="1509" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1628" dy="1258" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -184,22 +184,29 @@
             <mxPoint y="-9" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="6fm2Nr6pFytVAdn31GYa-65" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-63" target="6fm2Nr6pFytVAdn31GYa-64">
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-65" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.25;entryDx=0;entryDy=0;exitX=0.25;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-63" target="6fm2Nr6pFytVAdn31GYa-64">
           <mxGeometry relative="1" as="geometry">
+            <mxPoint x="450" y="822" as="sourcePoint" />
+            <mxPoint x="300" y="863" as="targetPoint" />
             <Array as="points">
-              <mxPoint x="450" y="867" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="6fm2Nr6pFytVAdn31GYa-84" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-63" target="6fm2Nr6pFytVAdn31GYa-66">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="470" y="867" />
+              <mxPoint x="448" y="855" />
+              <mxPoint x="450" y="855" />
             </Array>
           </mxGeometry>
         </mxCell>
         <mxCell id="6fm2Nr6pFytVAdn31GYa-103" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=1 4;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-63" target="6fm2Nr6pFytVAdn31GYa-5">
           <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aeYW699ksAII-Iu0-2w7-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-63" target="aeYW699ksAII-Iu0-2w7-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aeYW699ksAII-Iu0-2w7-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-63" target="6fm2Nr6pFytVAdn31GYa-66">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="467" y="855" />
+              <mxPoint x="531" y="855" />
+            </Array>
+          </mxGeometry>
         </mxCell>
         <mxCell id="6fm2Nr6pFytVAdn31GYa-63" value="SceneBreakdown" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
           <mxGeometry x="435" y="751" width="50" height="50" as="geometry" />
@@ -213,10 +220,15 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="6fm2Nr6pFytVAdn31GYa-64" value="ImagePromptGenerator" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
-          <mxGeometry x="350" y="842" width="50" height="50" as="geometry" />
+          <mxGeometry x="275" y="842" width="50" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="6fm2Nr6pFytVAdn31GYa-72" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-66" target="6fm2Nr6pFytVAdn31GYa-71">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-72" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-66" target="6fm2Nr6pFytVAdn31GYa-71">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="602" y="939" />
+              <mxPoint x="564" y="939" />
+            </Array>
+          </mxGeometry>
         </mxCell>
         <mxCell id="6fm2Nr6pFytVAdn31GYa-86" value="9. Generate&lt;div&gt;video prompts&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-72">
           <mxGeometry x="0.1436" y="-3" relative="1" as="geometry">
@@ -224,10 +236,16 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="6fm2Nr6pFytVAdn31GYa-66" value="VideoPromptGenerator" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
-          <mxGeometry x="510" y="842" width="50" height="50" as="geometry" />
+          <mxGeometry x="577" y="842" width="50" height="50" as="geometry" />
         </mxCell>
         <mxCell id="6fm2Nr6pFytVAdn31GYa-76" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-69" target="6fm2Nr6pFytVAdn31GYa-73">
-          <mxGeometry relative="1" as="geometry" />
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="403" y="996" />
+              <mxPoint x="403" y="1070" />
+              <mxPoint x="448" y="1070" />
+            </Array>
+          </mxGeometry>
         </mxCell>
         <mxCell id="6fm2Nr6pFytVAdn31GYa-87" value="10. Generate&amp;nbsp;&lt;span style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212)); color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;images&lt;/span&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-76">
           <mxGeometry x="-0.5235" relative="1" as="geometry">
@@ -238,10 +256,16 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="6fm2Nr6pFytVAdn31GYa-69" value="ImageGenerator" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
-          <mxGeometry x="350" y="970" width="50" height="50" as="geometry" />
+          <mxGeometry x="322" y="971" width="50" height="50" as="geometry" />
         </mxCell>
         <mxCell id="6fm2Nr6pFytVAdn31GYa-77" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-71" target="6fm2Nr6pFytVAdn31GYa-73">
-          <mxGeometry relative="1" as="geometry" />
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="513" y="995" />
+              <mxPoint x="513" y="1067" />
+              <mxPoint x="473" y="1067" />
+            </Array>
+          </mxGeometry>
         </mxCell>
         <mxCell id="6fm2Nr6pFytVAdn31GYa-88" value="10. Generate&amp;nbsp;&lt;span style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212)); color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;videos&lt;/span&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="6fm2Nr6pFytVAdn31GYa-77">
           <mxGeometry x="0.0865" relative="1" as="geometry">
@@ -252,7 +276,7 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="6fm2Nr6pFytVAdn31GYa-71" value="VideoGenerator" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
-          <mxGeometry x="510" y="970" width="50" height="50" as="geometry" />
+          <mxGeometry x="539" y="970" width="50" height="50" as="geometry" />
         </mxCell>
         <mxCell id="6fm2Nr6pFytVAdn31GYa-79" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-73" target="6fm2Nr6pFytVAdn31GYa-78">
           <mxGeometry relative="1" as="geometry" />
@@ -274,8 +298,9 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6fm2Nr6pFytVAdn31GYa-93" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-78" target="6fm2Nr6pFytVAdn31GYa-91">
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-93" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-78">
           <mxGeometry relative="1" as="geometry">
+            <mxPoint x="500" y="1246" as="targetPoint" />
             <Array as="points">
               <mxPoint x="470" y="1228" />
               <mxPoint x="470" y="1246" />
@@ -290,9 +315,6 @@
         </mxCell>
         <mxCell id="6fm2Nr6pFytVAdn31GYa-90" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://www.iconpacks.net/icons/1/free-video-icon-836-thumb.png;" vertex="1" parent="1">
           <mxGeometry x="495" y="1173" width="52" height="52" as="geometry" />
-        </mxCell>
-        <mxCell id="6fm2Nr6pFytVAdn31GYa-91" value="" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn2.iconfinder.com/data/icons/essential-web-5/50/script-programming-coding-add-on-128.png" vertex="1" parent="1">
-          <mxGeometry x="500" y="1225" width="42" height="42" as="geometry" />
         </mxCell>
         <mxCell id="6fm2Nr6pFytVAdn31GYa-96" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="6fm2Nr6pFytVAdn31GYa-78" target="6fm2Nr6pFytVAdn31GYa-95">
           <mxGeometry relative="1" as="geometry">
@@ -310,7 +332,21 @@
           <mxGeometry x="240" y="971" width="49" height="49" as="geometry" />
         </mxCell>
         <mxCell id="6fm2Nr6pFytVAdn31GYa-100" value="Veo" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://analisemacro.com.br/wp-content/uploads/2024/06/ai-studio-icon.png;dashed=1;dashPattern=1 4;" vertex="1" parent="1">
-          <mxGeometry x="604" y="970" width="49" height="49" as="geometry" />
+          <mxGeometry x="613" y="970" width="49" height="49" as="geometry" />
+        </mxCell>
+        <mxCell id="6fm2Nr6pFytVAdn31GYa-106" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.script;" vertex="1" parent="1">
+          <mxGeometry x="498" y="1225" width="46" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="aeYW699ksAII-Iu0-2w7-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="aeYW699ksAII-Iu0-2w7-1" target="6fm2Nr6pFytVAdn31GYa-73">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aeYW699ksAII-Iu0-2w7-4" value="9. Generate&lt;div&gt;voiceovers&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="aeYW699ksAII-Iu0-2w7-3">
+          <mxGeometry x="-0.1493" y="1" relative="1" as="geometry">
+            <mxPoint x="-5" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="aeYW699ksAII-Iu0-2w7-1" value="VoiceoverGenerator" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://google.github.io/adk-docs/assets/agent-development-kit.png;" vertex="1" parent="1">
+          <mxGeometry x="435" y="908" width="50" height="50" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

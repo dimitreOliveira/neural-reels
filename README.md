@@ -127,5 +127,5 @@ This project is licensed under the Apache License 2.0. See the LICENSE file for 
 
 ## Acknowledgements
 
-*   Google Cloud credits are provided for this project, this project was made possible with the support of the Google for Developers team.
+*   This project was made possible with the support of the Google for Developers team, and Google Cloud credits were provided for this project during the #AISprint.
 *   Built with the Google Agent Development Kit (ADK).

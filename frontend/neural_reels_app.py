@@ -115,7 +115,7 @@ def send_message(message: str) -> None:
                     "session_id": st.session_state.session_id,
                     "new_message": {"role": "user", "parts": [{"text": message}]},
                 },
-                timeout=3600,  # Increased timeout for potentially long video generation
+                timeout=36000,  # Increased timeout for potentially long video generation
             )
             response.raise_for_status()
 
