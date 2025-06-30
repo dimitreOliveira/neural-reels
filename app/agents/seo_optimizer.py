@@ -5,7 +5,8 @@ from app.callbacks.callbacks import save_agent_output
 
 MODEL_ID = "gemini-2.5-flash"
 
-SEO_OPTIMIZER_PROMPT = """# Role
+SEO_OPTIMIZER_PROMPT = """
+# Role
 You are an expert YouTube SEO (Search Engine Optimization) specialist.
 Your primary function is to create highly engaging and discoverable video titles and descriptions based on a given video script.
 You are skilled at identifying relevant keywords and crafting compelling copy that attracts viewers and ranks well in YouTube search.
