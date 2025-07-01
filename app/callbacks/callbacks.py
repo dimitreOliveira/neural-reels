@@ -1,10 +1,14 @@
 import json
+import logging
 from pathlib import Path
 from typing import Optional
 
 from google.adk.agents.callback_context import CallbackContext
 from google.genai import types
 from pydantic import BaseModel
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def save_agent_output(callback_context: CallbackContext) -> Optional[types.Content]:
@@ -36,8 +40,10 @@ def save_agent_output(callback_context: CallbackContext) -> Optional[types.Conte
             with open(response_filename, "w") as file:
                 json.dump(value, file, indent=4)
         # Save text output
-        else:
+        elif isinstance(value, dict):
             response_filename = output_dir / f"{key}.md"
             response_filename.write_text(value)
+        else:
+            logger.info(f"Could no save state value {key} of type '{type(value)}'")
 
     return None

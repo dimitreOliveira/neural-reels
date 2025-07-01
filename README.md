@@ -9,6 +9,13 @@ This project uses the [Google Agent Development Kit (ADK)](https://google.github
 
 ---
 
+I recorderd a video walkthrough with a demonstration of this code, and also wrote a blog post about it, which you can find at the links below:
+
+- [Building an AI Video Creator with Google's ADK and Gemini (Neural Reels Project)](https://youtu.be/NpCq8OFUBgA?si=CPBtwzlR-sZAmgf0)
+- [Neural Reels: How AI Agents Can Revolutionize Content Creation](https://dimitreoliveira.medium.com/neural-reels-how-ai-agents-can-revolutionize-content-creation-bc224499c93a)
+
+---
+
 ## How It Works
 
 The application follows an interactive, multi-step workflow managed by the orchestrator agent. This agent guides the user through the creative process, ensuring the final output aligns with their vision.
