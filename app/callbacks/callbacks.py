@@ -40,7 +40,7 @@ def save_agent_output(callback_context: CallbackContext) -> Optional[types.Conte
             with open(response_filename, "w") as file:
                 json.dump(value, file, indent=4)
         # Save text output
-        elif isinstance(value, dict):
+        elif isinstance(value, str):
             response_filename = output_dir / f"{key}.md"
             response_filename.write_text(value)
         else:
