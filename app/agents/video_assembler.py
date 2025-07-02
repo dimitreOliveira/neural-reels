@@ -15,7 +15,7 @@ from moviepy import (
     VideoFileClip,
     concatenate_videoclips,
 )
-from moviepy.video.fx import TimeMirror
+from moviepy.video.fx import Loop, TimeMirror
 from pydantic import Field
 from typing_extensions import override
 
@@ -203,6 +203,11 @@ class VideoAssemblerAgent(BaseAgent):
                 scene_clip = concatenate_videoclips(
                     video_clips + image_clips, method="compose"
                 )
+
+                if scene_clip.duration > audio_clip.duration:
+                    scene_clip = scene_clip.subclipped(0, audio_clip.duration)
+                elif audio_clip.duration > scene_clip.duration:
+                    scene_clip = Loop(duration=audio_clip.duration).apply(scene_clip)
 
                 # Set voiceover as the clip audio
                 scene_clip = scene_clip.with_audio(audio_clip)
