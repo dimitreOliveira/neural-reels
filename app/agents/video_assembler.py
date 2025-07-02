@@ -204,6 +204,13 @@ class VideoAssemblerAgent(BaseAgent):
                     video_clips + image_clips, method="compose"
                 )
 
+                if scene_clip.duration > audio_clip.duration:
+                    scene_clip = scene_clip.subclipped(0, audio_clip.duration)
+                elif audio_clip.duration > scene_clip.duration:
+                    from moviepy.video.fx import Loop
+
+                    scene_clip = Loop(duration=audio_clip.duration).apply(scene_clip)
+
                 # Set voiceover as the clip audio
                 scene_clip = scene_clip.with_audio(audio_clip)
 
