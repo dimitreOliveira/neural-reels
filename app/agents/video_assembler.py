@@ -200,9 +200,11 @@ class VideoAssemblerAgent(BaseAgent):
 
             if video_clips or image_clips:
                 # Concatenaten the clips
-                scene_clip = concatenate_videoclips(
-                    video_clips + image_clips, method="compose"
-                )
+                scene_assets = video_clips + image_clips
+                # Shuffle the clips to make them more dynamic
+                random.shuffle(scene_assets)
+
+                scene_clip = concatenate_videoclips(scene_assets, method="compose")
 
                 if scene_clip.duration > audio_clip.duration:
                     scene_clip = scene_clip.subclipped(0, audio_clip.duration)
