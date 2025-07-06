@@ -1,4 +1,5 @@
 import logging
+import random
 from pathlib import Path
 from typing import Any, AsyncGenerator
 
@@ -21,7 +22,39 @@ logger = logging.getLogger(__name__)
 
 
 MODEL_ID = "gemini-2.5-flash-preview-tts"
-VOICE_NAME = "Algenib"
+
+available_voices = [
+    "Zephyr",
+    "Puck",
+    "Charon",
+    "Kore",
+    "Fenrir",
+    "Leda",
+    "Orus",
+    "Aoede",
+    "Callirrhoe",
+    "Autonoe",
+    "Enceladus",
+    "Iapetus",
+    "Umbriel",
+    "Algieba",
+    "Despina",
+    "Erinome",
+    "Algenib",
+    "Rasalgethi",
+    "Laomedeia",
+    "Achernar",
+    "Alnilam",
+    "Schedar",
+    "Gacrux",
+    "Pulcherrima",
+    "Achird",
+    "Zubenelgenubi",
+    "Vindemiatrix",
+    "Sadachbia",
+    "Sadaltager",
+    "Sulafat",
+]
 
 
 class VoiceoverGeneratorAgent(BaseAgent):
@@ -137,7 +170,9 @@ class VoiceoverGeneratorAgent(BaseAgent):
         Yields:
             Events indicating the overall progress of voiceover generation.
         """
-        logger.info(f"[{self.name}] Starting voiceover generation for multiple scenes.")
+        logger.info(
+            f"[{self.name}] Starting voiceover generation for multiple scenes, using voice '{self.voice_name}'."
+        )
 
         # Setup
         assets_path = Path(ctx.session.state.get("assets_path"))
@@ -179,7 +214,7 @@ voiceover_generator_agent = VoiceoverGeneratorAgent(
     name="VoiceoverGeneratorAgent",
     description="Generates voiceover audio files from a list of text scripts, one for each scene.",
     model=MODEL_ID,
-    voice_name=VOICE_NAME,
+    voice_name=random.choice(available_voices),
     input_key="scenes",
     output_key="voiceovers_path",
     output_subdir="voiceovers",
