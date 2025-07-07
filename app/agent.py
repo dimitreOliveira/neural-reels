@@ -431,6 +431,11 @@ class VideoCreatorWorkflowAgent(BaseAgent):
                 async for event in self._run_sub_agent(self.video_generator, ctx):
                     yield event
 
+                # 10. Video assembling
+                yield text2event(self.name, "Assembling final video...")
+                async for event in self._run_sub_agent(self.video_assembler, ctx):
+                    yield event
+
                 # 11. SEO Optimization
                 yield text2event(
                     self.name, "Optimizing video title and description for SEO..."

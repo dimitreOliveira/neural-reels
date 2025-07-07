@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-MODEL_ID = "models/imagen-4.0-ultra-generate-preview-06-06"
+MODEL_ID = "models/imagen-3.0-generate-002"
 ASPECT_RATIO = "9:16"
 
 
@@ -189,4 +189,5 @@ image_generator_agent = ImagenAgent(
     output_key="images_path",
     model=MODEL_ID,
     aspect_ratio=ASPECT_RATIO,
+    images_per_prompt=3,
 )
